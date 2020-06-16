@@ -12,8 +12,11 @@ We are not responsible for any damages. You are responsible for your own actions
 # Don't despair if it takes longer than my algorithm is optimized, 
 # Remember you have to navigate a bit to see your local traffic 
 $ sudo python darksniffer.py
-# to stop the process you must type the keyboard shortcut ctr + c
-> darksnifer running ...
+# to stop the process you must type the keyboard shortcut ctrl + c or press esc to exit!
+> darksnifer running ... (Wait esc key)
+> Bye.
+$
+
 ```
 
 # Author
