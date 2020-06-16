@@ -30,7 +30,7 @@ $
 The Transmission Control Protocol (TCP) is used as a a host-to-host protocol between hosts on a computer for packet switching,
 communication networks and in systems interconnected between networks.
 For more info you can visit [RFC 793](https://tools.ietf.org/html/rfc793)
-The different layers of abstraction are shown below.
+The different layers of abstraction are shown below. the figures were obtained from the previously published link
                             
                             Protocol Layering
 
