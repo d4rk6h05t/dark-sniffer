@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
 """
-By: d4rk6h05t [ Michani. M. De La Calleja E. ]
-
 We point out that the hacking related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only.
 We are not responsible for any damages. You are responsible for your own actions.
 
@@ -11,23 +9,40 @@ Sniffers are programs that can capture/sniff/detect package of network traffic p
 additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script, for example: 
  
  $ sudo python darksniffer.py
-
+ 
+By: d4rk6h05t [ Michani. M. De La Calleja E. ]
 """
 from struct import *
 import socket, sys, keyboard
 
 class DarkSniffer:
     
+    def __init__(self,version):
+        self._version = version
+    
+    def __repr__(self):
+        return 'DarkSniffer({})'.format(self._version)
+    
+    @property
+    def version(self):
+        return self._version
+
+    @version.setter
+    def version(self, version):
+        self._version = version
+    
+    
     def banner(self):
-        print(f' _       __   _  __    ____ _  _ _ ________________   \n'
-              f'|++\ /\ |**\ |(|/;/___| ___| \| | | .__| .__| -_|**\  \n'
-              f'|+.&/&_\|@#/ |+_./|___|___ |  \ | | |__| |__| -_|$%/  \n'
-              f'|__/_/\_\|\_\|+|\_\   |____|_|\_|_|_|  |_|  |___|_^_\ \n')
-        print(f':: By: d4rk6h05t  :: An small  5n1ff3r V1.0.0 ')
+        print(f' _    _   ____  _  __    ____ _  _ _ _________________   \n'
+              f'|  \ / \ |    \| |/ /___| ___| \| | | .__| .__| __|   \  \n'
+              f'| & / x \| ^  /|   /|___|___ |  \ | | |__| |__| __| ^ /  \n'
+              f'|__/_/\_\|_^\_\|_|\_\   |____|_|\_|_|_|  |_|  |___|_^\_\ \n')
+        print(f':: By: d4rk6h05t  :: An small  5n1ff3r {self._version} ')
     
     def check_protocol(self,number_protocol):
         # based in IP Protocol numbers found in the Protocol field of the IPv4 header
         # for more info: https://en.wikipedia.org/wiki/List_of_IP_Protocol_numbers
+        # Currently the most commonly used protocol is TCP but there may be exceptions 
         protocols = { 
             0: ':: [ HOPOPT ] :: IPv6 Hop-by-Hop Option ............:: RFC 8200', 
             1: ':: [  ICMP  ] :: Internet Control Message Protocol .:: RFC 792', 
@@ -71,10 +86,13 @@ class DarkSniffer:
             sys.exit()
         
         while True:
-            if keyboard.is_pressed('esc'):   
-                print('Bye!')
+            try:
+                if keyboard.is_pressed('esc'):   
+                    print('Bye!')
+                    break
+            except:
                 break
-            # Receive data from the socket. 
+            # Receive data from the socket packaged. 
             tcp_package = server_socket.recvfrom(65565)
             # TCP package, Take the first 20 characters for the IP header.
             tcp_package = tcp_package[0] 
@@ -87,7 +105,8 @@ class DarkSniffer:
             ip_header_version = ip_header_length_version >> 4
             ip_header_length = ip_header_length_version & 0xF
             ip_header_unpacked_length = ip_header_length * 4
-            # TTL [ Time to Live ]
+            
+            # TTL [ Time to Live ] & TCP Protocol
             time_to_live, tcp_protocol = ip_header_unpacked[5], ip_header_unpacked[6]
             source_address,target_address = socket.inet_ntoa(ip_header_unpacked[8]), socket.inet_ntoa(ip_header_unpacked[9])
 
@@ -99,22 +118,24 @@ class DarkSniffer:
             source_port, target_port, sequence, recognition, data_reserved = tcp_header[0], tcp_header[1], tcp_header[2], tcp_header[3], tcp_header[4]
             tcp_header_length = data_reserved >> 4
             header_size = ip_header_unpacked_length + tcp_header_length * 4
+            
             # Retrieve package data TCP
             data = tcp_package[header_size:]
             
-            # Display information on intercepted package (network traffic)
+            # Display information on intercepted package (Network Traffic)
             self.display_headers_package(ip_header_version,ip_header_length,time_to_live,tcp_protocol,source_address,target_address)
             self.display_info_package(source_port,target_port,sequence,recognition,tcp_header_length)    
+            
+            # If the target you're analyzing is using the https protocol, the information will obviously be encrypted. 
+            # On the other hand, if the target you are scanning only uses http, the information will appear in plain text.
             self.display_data_package(data)
+        
+        sys.exit()
              
-            
-            
-
 def main(argv):
-    darksniffer = DarkSniffer()
+    darksniffer = DarkSniffer('v1.0.0')
     darksniffer.banner()
     darksniffer.intercept_package()
-    sys.exit()
     
 if __name__ == '__main__':
     main(sys.argv[1:])
