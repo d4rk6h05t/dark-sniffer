@@ -18,6 +18,39 @@ $ sudo python darksniffer.py
 $
 
 ```
+# Intro to TCP
+Protocol Layering
+
+                        +---------------------+
+                        |     higher-level    |
+                        +---------------------+
+                        |        TCP          |
+                        +---------------------+
+                        |  internet protocol  |
+                        +---------------------+
+                        |communication network|
+                        +---------------------+
+                        
+                        
+                        
+
+       +------+ +-----+ +-----+       +-----+
+       |Telnet| | FTP | |Voice|  ...  |     |  Application Level
+       +------+ +-----+ +-----+       +-----+
+             |   |         |             |
+            +-----+     +-----+       +-----+
+            | TCP |     | RTP |  ...  |     |  Host Level
+            +-----+     +-----+       +-----+
+               |           |             |
+            +-------------------------------+
+            |    Internet Protocol & ICMP   |  Gateway Level
+            +-------------------------------+
+                           |
+              +---------------------------+
+              |   Local Network Protocol  |    Network Level
+              +---------------------------+
+
+                         Protocol Relationships
 
 # Author
 By: Michani M. De La Calleja E. ( d4rk6h05t ) 
