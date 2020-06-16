@@ -12,10 +12,9 @@ additional note to successfully run the script you must be root or prepend the s
  
  $ sudo python darksniffer.py
 
-The following script is a bit slow and not currently optimized, so don't despair if it doesn't run fast, you have to wait a few seconds.
 """
 from struct import *
-import socket, sys
+import socket, sys, keyboard
 
 class DarkSniffer:
     
@@ -72,6 +71,9 @@ class DarkSniffer:
             sys.exit()
         
         while True:
+            if keyboard.is_pressed('esc'):   
+                print('Bye!')
+                break
             # Receive data from the socket. 
             tcp_package = server_socket.recvfrom(65565)
             # TCP package, Take the first 20 characters for the IP header.
@@ -104,11 +106,15 @@ class DarkSniffer:
             self.display_headers_package(ip_header_version,ip_header_length,time_to_live,tcp_protocol,source_address,target_address)
             self.display_info_package(source_port,target_port,sequence,recognition,tcp_header_length)    
             self.display_data_package(data)
+             
+            
+            
 
 def main(argv):
     darksniffer = DarkSniffer()
     darksniffer.banner()
     darksniffer.intercept_package()
+    sys.exit()
     
 if __name__ == '__main__':
     main(sys.argv[1:])
