@@ -6,25 +6,28 @@ By: d4rk6h05t [ Michani. M. De La Calleja E. ]
 We point out that the hacking related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only.
 We are not responsible for any damages. You are responsible for your own actions.
 
-Sniffer [ small Sniffer only TCP incoming package ]
+DarkSniffer [ small DarkSniffer only TCP incoming package ]
 Sniffers are programs that can capture/sniff/detect package of network traffic per packet and analyze
 additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script, for example: 
  
- $ sudo python sniffer.py
+ $ sudo python darksniffer.py
 
 The following script is a bit slow and not currently optimized, so don't despair if it doesn't run fast, you have to wait a few seconds.
 """
 from struct import *
 import socket, sys
 
-class Sniffer:
+class DarkSniffer:
     
     def __init__(self):
         pass
     
     def banner(self):
-        print(':: An small packet 5n1ff3r v1.0 ')
-        print(':: By: d4rk6h05t')
+        print(f' _       __   _  __    ____ _  _ _ ________________   \n'
+              f'|++\ /\ |**\ |(|/;/___| ___| \| | | .__| .__| -_|**\  \n'
+              f'|+.&/&_\|@#/ |+_./|___|___ |  \ | | |__| |__| -_|$%/  \n'
+              f'|__/_/\_\|\_\|+|\_\   |____|_|\_|_|_|  |_|  |___|_^_\ \n')
+        print(':: By: d4rk6h05t :: An small  5n1ff3r v1.0 ')
     
     def display_headers_package(self,version,ip_header_length,ttl,protocol,source_address,target_address):
         print(f'Version: {str(version)}\n'
@@ -86,9 +89,9 @@ class Sniffer:
             self.display_data_package(data)
 
 def main(argv):
-    sniffer = Sniffer()
-    sniffer.banner()
-    sniffer.intercept_package()
+    darksniffer = DarkSniffer()
+    darksniffer.banner()
+    darksniffer.intercept_package()
     
 if __name__ == '__main__':
     main(sys.argv[1:])
