@@ -57,8 +57,9 @@ class Sniffer:
         # Receive a package tcp
         while True:
             tcp_packet = server_socket.recvfrom(65565)
-            tcp_packet = tcp_packet[0] # TCP packet of strings from tuple.
-            ip_header = tcp_packet[0:20] # Take the first 20 characters for the IP header
+            # TCP packet of strings from tuple, Take the first 20 characters for the IP header.
+            tcp_packet = tcp_packet[0] 
+            ip_header = tcp_packet[0:20] 
             ip_header_unpacked = unpack('!BBHHHBBH4s4s', ip_header) # Now unpack them IP header
             
             # TCP IP package metadata collection
@@ -66,23 +67,16 @@ class Sniffer:
             version = version_ip_header_length >> 4
             ip_header_length = version_ip_header_length & 0xF
             ip_header_unpacked_length = ip_header_length * 4
-            ttl = ip_header_unpacked[5]
-            protocol = ip_header_unpacked[6]
-            source_address = socket.inet_ntoa(ip_header_unpacked[8]);
-            target_address = socket.inet_ntoa(ip_header_unpacked[9]);
+            ttl, protocol = ip_header_unpacked[5], ip_header_unpacked[6]
+            source_address,target_address = socket.inet_ntoa(ip_header_unpacked[8]), socket.inet_ntoa(ip_header_unpacked[9])
 
             tcp_header = tcp_packet[ip_header_unpacked_length:ip_header_unpacked_length + 20]
             tcp_header = unpack('!HHLLBBHHH' , tcp_header) # Now unpack them TCP header
             
             # Package metadata collection TCP header
-            source_port = tcp_header[0]
-            target_port = tcp_header[1]
-            sequence = tcp_header[2]
-            recognition = tcp_header[3]
-            data_reserved = tcp_header[4]
+            source_port, target_port, sequence, recognition, data_reserved = tcp_header[0], tcp_header[1], tcp_header[2], tcp_header[3], tcp_header[4]
             tcp_header_length = data_reserved >> 4
             header_size = ip_header_unpacked_length + tcp_header_length * 4
-            
             # Retrieve packet data TCP
             data = tcp_packet[header_size:]
             
