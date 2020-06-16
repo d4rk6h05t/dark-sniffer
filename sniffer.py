@@ -7,7 +7,7 @@ We point out that the hacking related material found in the github account (d4rk
 We are not responsible for any damages. You are responsible for your own actions.
 
 Sniffer [ small Sniffer only TCP incoming package ]
-Sniffers are programs that can capture/sniff/detect packets of network traffic per packet and analyze
+Sniffers are programs that can capture/sniff/detect package of network traffic per packet and analyze
 additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script, for example: 
  
  $ sudo python sniffer.py
@@ -26,7 +26,26 @@ class Sniffer:
         print(':: An small packet 5n1ff3r v1.0 ')
         print(':: By: d4rk6h05t')
     
-    def intercept_packets(self):
+    def display_headers_package(self,version,ip_header_length,ttl,protocol,source_address,target_address):
+        print(f'Version: {str(version)}\n'
+                f'IP Header Length: {str(ip_header_length)}\n'
+                f'TTL: {str(ttl)}\n'
+                f'Protocol :{str(protocol)}\n'
+                f'Source Address: {str(source_address)}\n'
+                f'Target Address :{str(target_address)}\n')
+    
+    def display_info_package(self,source_port,target_port,sequence,recognition,tcp_header_length):
+        print(f'Source Port: {str(source_port)}\n'
+                f'Target Port : {str(target_port)}\n'
+                f'Sequence Number : {str(sequence)}\n'
+                f'Recognition :{str(recognition)}\n'
+                f'TCP header length :{str(tcp_header_length)}\n')
+    
+    def display_data_package(self,data):
+        print(f'Data : {data}')
+        print('')
+        
+    def intercept_package(self):
         try:
             # Create an INET, STREAMing socket
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
@@ -67,27 +86,15 @@ class Sniffer:
             # Retrieve packet data TCP
             data = tcp_packet[header_size:]
             
-            # Display information on intercepted packets (network traffic)
-            print(f'Version: {str(version)}\n'
-                f'IP Header Length: {str(ip_header_length)}\n'
-                f'TTL: {str(ttl)}\n'
-                f'Protocol :{str(protocol)}\n'
-                f'Source Address: {str(source_address)}\n'
-                f'Target Address :{str(target_address)}\n')
-            
-            print(f'Source Port: {str(source_port)}\n'
-                f'Target Port : {str(target_port)}\n'
-                f'Sequence Number : {str(sequence)}\n'
-                f'Recognition :{str(recognition)}\n'
-                f'TCP header length :{str(tcp_header_length)}\n')
-
-            print(f'Data : {data}')
-            print('')
+            # Display information on intercepted package (network traffic)
+            self.display_headers_package(version,ip_header_length,ttl,protocol,source_address,target_address)
+            self.display_info_package(source_port,target_port,sequence,recognition,tcp_header_length)    
+            self.display_data_package(data)
 
 def main(argv):
     sniffer = Sniffer()
     sniffer.banner()
-    sniffer.intercept_packets()
+    sniffer.intercept_package()
     
 if __name__ == '__main__':
     main(sys.argv[1:])
