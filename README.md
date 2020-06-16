@@ -12,14 +12,19 @@ We are not responsible for any damages. You are responsible for your own actions
 # Don't despair if it takes longer than my algorithm is optimized, 
 # Remember you have to navigate a bit to see your local traffic 
 $ sudo python darksniffer.py
-# to stop the process you must type the keyboard shortcut ctrl + c or press esc to exit!
+# to stop the process you must type the keyboard shortcut ctrl + c or press  several times esc to exit!
 > darksnifer running ... (Wait esc key)
 > Bye.
 $
 
 ```
-# Intro to TCP
-Protocol Layering
+# Intro to Transmission Control Protocol (TCP)
+The Transmission Control Protocol (TCP) is used as a a host-to-host protocol between hosts on a computer for packet switching,
+communication networks and in systems interconnected between networks.
+For more info you can visit [RFC 793](https://tools.ietf.org/html/rfc793)
+The different layers of abstraction are shown below.
+                            
+                            Protocol Layering
 
                         +---------------------+
                         |     higher-level    |
@@ -31,8 +36,7 @@ Protocol Layering
                         |communication network|
                         +---------------------+
                         
-                        
-                        
+                         Protocol Relationships 
 
        +------+ +-----+ +-----+       +-----+
        |Telnet| | FTP | |Voice|  ...  |     |  Application Level
@@ -50,7 +54,8 @@ Protocol Layering
               |   Local Network Protocol  |    Network Level
               +---------------------------+
 
-                         Protocol Relationships
+                         
+
 
 # Author
 By: Michani M. De La Calleja E. ( d4rk6h05t ) 
