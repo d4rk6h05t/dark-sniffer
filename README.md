@@ -7,11 +7,19 @@ Sniffer [ small Sniffer only TCP incoming package ] Sniffers are programs that c
 We point out that the hacking related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only.
 We are not responsible for any damages. You are responsible for your own actions.
 
+# Requirements
+The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
+ and **keyboard** package.
+
 # Usage
 ```sh
 # Don't despair if it takes longer than my algorithm is optimized, 
-# Remember you have to navigate a bit to see your local traffic 
+# Remember you have to navigate a bit to see your local traffic
+# You can install keyboard package with pip or pip3
+$ pip install keyboard
 $ sudo python darksniffer.py
+# or also you can use
+$ sudo ./darksniffer.py
 # to stop the process you must type the keyboard shortcut ctrl + c or press  several times esc to exit!
 > darksnifer running ... (Wait esc key)
 > Bye.
@@ -22,7 +30,7 @@ $
 The Transmission Control Protocol (TCP) is used as a a host-to-host protocol between hosts on a computer for packet switching,
 communication networks and in systems interconnected between networks.
 For more info you can visit [RFC 793](https://tools.ietf.org/html/rfc793)
-The different layers of abstraction are shown below.
+The different layers of abstraction are shown below. the figures were obtained from the previously published link
                             
                             Protocol Layering
 
