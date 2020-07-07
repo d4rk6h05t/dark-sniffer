@@ -1,5 +1,9 @@
 #!/usr/bin/python
-
+# -*- coding: utf-8 -*-
+__author__  = 'd4rk6h05t [Michani. M. De La Calleja E.]'
+__version__ = 'v1.0.0'
+__github__  = 'https://github.com/d4rk6h05t/dark-sniffer'
+__email__   = 'd4rk6h05t_0d4y5@protonmail.ch'
 """
 We point out that the hacking related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only.
 We are not responsible for any damages. You are responsible for your own actions.
@@ -15,8 +19,10 @@ additional note to successfully run the script you must be root or prepend the s
 Author: d4rk6h05t [ Michani. M. De La Calleja E. / d4rk6h05t_0d4y5@protonmail.ch ]
 
 """
+import time
 from struct import *
 import socket, sys, keyboard
+from prettytable import PrettyTable
 
 class DarkSniffer:
     
@@ -41,7 +47,7 @@ class DarkSniffer:
               f'██║   █║█ ╔══██║██╔══██╗██╔═██╗╚════╝╚════██║██║╚████║  ██║  ██╔═══╝██╔═══╝██╔══╝  ██╔══██╗\n'
               f'███████║█ ║  ██║██║  ██║██║  ██╗     ███████║██║ ╚═██║██████╗██║    ██║    ███████╗██║  ██║\n'
               f' ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚═╝   ╚═╝╚═════╝╚═╝    ╚═╝    ╚══════╝╚═╝  ╚═╝\n')
-        print(f'[+]\t :: By: d4rk6h05t  \n[+]\t :: An small  5n1ff3r {self._version} ')
+        print(f'[+]\t:: By: {__author__} \n[+]\t:: An small  5n1ff3r {self._version} ')
     
     def get_protocol(self,number_protocol):
         # based in IP Protocol numbers found in the Protocol field of the IPv4 header
@@ -61,6 +67,16 @@ class DarkSniffer:
             9: ['IGP', 'Interior Gateway Protocol', ''],
         } 
         return protocols.get(number_protocol, 'number_protocol')
+    
+    def load_progress_bar(self,package_number, total_collect_packages):
+        prefix, suffix  = 'Loading...:', 'Progress:'
+        percent = ('{0:.' + str(0) + 'f}').format( (100 * package_number) / float(total_collect_packages)  )
+        filled_space = int( (50 * package_number) // total_collect_packages )
+        bar = '█' * filled_space + '-' * (50 - filled_space)
+        print(f'\r{prefix} |{bar}|  {suffix:}{percent}% ({package_number}/{total_collect_packages} collected packages)', end = '\r')
+        if package_number == total_collect_packages: 
+            prefix, suffix  = 'Ready ...:', 'Completed:'
+            print()
    
     def intercept_package(self):
         try:
@@ -68,17 +84,33 @@ class DarkSniffer:
             # Which include standard IP and TCP and UDP port numbers. 
             # Create a raw socket and bind it to the public interface
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
-            print('No.  Source  \t  Destination  \t  Protocol  \t  IP Header version \t IP Header Length \t TTL \t Source port \t Destination Port \t sequence \t recognition \t TCP Header Length ')
+            table = PrettyTable()
+            table.field_names = [
+                '#',
+                'Source',
+                'Destination',
+                'Protocol',
+                'IP Head. V',
+                'IP Head. L.',
+                'TTL',
+                'src p.',
+                'des p.',
+                'sequence',
+                'recognition',
+                'TCP H L',
+                'data',
+            ]
+            total_collect_packages = 50
+            self.load_progress_bar(0, total_collect_packages)
+            
         except socket.error as message:
             print('Problem in the socket cant create.  : SocketExeption' + str(message[0]) + ' Message ' + message[1])
             sys.exit()
         package_number = 1
         while True:
-            try:
-                if keyboard.is_pressed('esc'):   
-                    print('Bye!')
-                    break
-            except:
+            time.sleep(0.1)
+            self.load_progress_bar(package_number, total_collect_packages)
+            if package_number == total_collect_packages:
                 break
             # Receive data from the socket packaged. 
             tcp_package = server_socket.recvfrom(65565)
@@ -108,19 +140,47 @@ class DarkSniffer:
             header_size = ip_header_unpacked_length + tcp_header_length * 4
             
             # Retrieve package data TCP
-            data = tcp_package[header_size:]
-            
-            # Display information on intercepted package (Network Traffic)
-            print('[',package_number,']\t',source_address,'\t',destination_address,'\t',(self.get_protocol(tcp_protocol))[0],'\t',ip_header_version,'\t',ip_header_length,'\t',time_to_live,'\t',source_port,'\t',destination_port,'\t',sequence,'\t',recognition,'\t',tcp_header_length)
-            
             # If the target you're analyzing is using the https protocol, the information will obviously be encrypted. 
             # On the other hand, if the target you are scanning only uses http, the information will appear in plain text.
+            data = tcp_package[header_size:]
+            data_saved = str(data)[0:50] 
+            package_info = [
+                package_number,
+                source_address,
+                destination_address,
+                (self.get_protocol(tcp_protocol))[0],
+                ip_header_version,
+                ip_header_length,
+                time_to_live,
+                source_port,
+                destination_port,
+                sequence,
+                recognition,
+                tcp_header_length,
+                data_saved,
+            ]
+            table.add_row(package_info)
             package_number += 1
-        
+        print(f'[+]\t:: Protocol   :  {(self.get_protocol(tcp_protocol))[0]}'
+                 f'\t:: IP Head. V :  {ip_header_version}' 
+                 f'\t:: IP Head. L.: {ip_header_length}')
+        print(table.get_string(fields=[
+                '#',
+                'Source',
+                'Destination',
+                'TTL',
+                'src p.',
+                'des p.',
+                'sequence',
+                'recognition',
+                'TCP H L',
+                'data',
+            ]))
+        print('\nBye ..... OK!\n')
         sys.exit()
              
 def main(argv):
-    darksniffer = DarkSniffer('v1.0.0')
+    darksniffer = DarkSniffer(__version__)
     darksniffer.banner()
     darksniffer.intercept_package()
     
