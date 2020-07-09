@@ -9,7 +9,7 @@ We are not responsible for any damages. You are responsible for your own actions
 
 # Requirements
 The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
- and **keyboard** package.
+ and **prettytable** package.
 
 # Usage
 ```sh
