@@ -26,12 +26,10 @@ $ sudo ./darksniffer.py
 ██║   █║█ ╔══██║██╔══██╗██╔═██╗╚════╝╚════██║██║╚████║  ██║  ██╔═══╝██╔═══╝██╔══╝  ██╔══██╗
 ███████║█ ║  ██║██║  ██║██║  ██╗     ███████║██║ ╚═██║██████╗██║    ██║    ███████╗██║  ██║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚═╝   ╚═╝╚═════╝╚═╝    ╚═╝    ╚══════╝╚═╝  ╚═╝
-[+]	:: By: d4rk6h05t [Michani. M. De La Calleja E.] 
-[+]	:: An small  5n1ff3r v1.0.0 
-[+]	:: Loading...: |██████████████████████████████████████████████████|  Progress:100% (50/50 collected packages)
-[+]	:: Protocol : TCP :: Destination addr : x.x.x.x :: TCP Header Length : n :: IP Headader Version : v.x :: IP Header Length.: n
-
-$
+ [+]:: By: d4rk6h05t [Michani. M. De La Calleja E.] 
+[+]:: An small  5n1ff3r v1.0.0 
+[+]:: Loading...: |██████████████████████████████████████████████████|  Progress:100% (50/50 collected packages)
+[+]:: Protocol: TCP :: Destination addr: x.x.x.x :: TCP Header Length: n :: IP Headader Version: v.x :: IP Header Length.: n
 
 ```
 # Intro to Transmission Control Protocol (TCP)
