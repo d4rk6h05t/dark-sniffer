@@ -20,15 +20,17 @@ $ pip install keyboard
 $ sudo python darksniffer.py
 # or also you can use
 $ sudo ./darksniffer.py
-# to stop the process you must type the keyboard shortcut ctrl + c or press  several times esc to exit!
 ███████╗ █████╗ ██████╗ ██╗  ██╗     ███████╗███╗  ██╗██████╗██████╗██████╗███████╗██████╗ 
 ██╔═══█║██╔══██╗██╔══██╗██║ ██╔╝     ██╔════╝████╗ ██║╚═██╔═╝██╔═══╝██╔═══╝██╔════╝██╔══██╗
 ██║   █║███████║██████╔╝█████╔╝█████╗███████╗██╔██╗██║  ██║  ██████╗██████╗█████╗  ██████╔╝
 ██║   █║█ ╔══██║██╔══██╗██╔═██╗╚════╝╚════██║██║╚████║  ██║  ██╔═══╝██╔═══╝██╔══╝  ██╔══██╗
 ███████║█ ║  ██║██║  ██║██║  ██╗     ███████║██║ ╚═██║██████╗██║    ██║    ███████╗██║  ██║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚═╝   ╚═╝╚═════╝╚═╝    ╚═╝    ╚══════╝╚═╝  ╚═╝
-> darksnifer running ... (Wait esc key)
-> Bye.
+[+]	:: By: d4rk6h05t [Michani. M. De La Calleja E.] 
+[+]	:: An small  5n1ff3r v1.0.0 
+[+]	:: Loading...: |██████████████████████████████████████████████████|  Progress:100% (50/50 collected packages)
+[+]	:: Protocol : TCP :: Destination addr : x.x.x.x :: TCP Header Length : n :: IP Headader Version : v.x :: IP Header Length.: n
+
 $
 
 ```
