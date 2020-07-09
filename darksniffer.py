@@ -20,8 +20,9 @@ Author: d4rk6h05t [ Michani. M. De La Calleja E. / d4rk6h05t_0d4y5@protonmail.ch
 
 """
 import time
+import binascii
 from struct import *
-import socket, sys, keyboard
+import socket, sys
 from prettytable import PrettyTable
 
 class DarkSniffer:
@@ -53,7 +54,7 @@ class DarkSniffer:
         # based in IP Protocol numbers found in the Protocol field of the IPv4 header
         # for more info: https://en.wikipedia.org/wiki/List_of_IP_Protocol_numbers
         # Currently the most commonly used protocol is TCP but there may be exceptions 
-        # return a
+        # return a list with protocol, small description and rfc
         protocols = { 
             0: ['HOPOPT','IPv6 Hop-by-Hop Option','8200'], 
             1: ['ICMP', 'Internet Control Message Protocol','792'], 
@@ -73,7 +74,7 @@ class DarkSniffer:
         percent = ('{0:.' + str(0) + 'f}').format( (100 * package_number) / float(total_collect_packages)  )
         filled_space = int( (50 * package_number) // total_collect_packages )
         bar = '█' * filled_space + '-' * (50 - filled_space)
-        print(f'\r{prefix} |{bar}|  {suffix:}{percent}% ({package_number}/{total_collect_packages} collected packages)', end = '\r')
+        print(f'\r[+]\t:: {prefix} |{bar}|  {suffix:}{percent}% ({package_number}/{total_collect_packages} collected packages)', end = '\r')
         if package_number == total_collect_packages: 
             prefix, suffix  = 'Ready ...:', 'Completed:'
             print()
@@ -96,7 +97,7 @@ class DarkSniffer:
                 'src p.',
                 'des p.',
                 'sequence',
-                'recognition',
+                'identification',
                 'TCP H L',
                 'data',
             ]
@@ -135,7 +136,7 @@ class DarkSniffer:
             tcp_header = unpack('!HHLLBBHHH' , tcp_header) 
             
             # Package metadata collection TCP header
-            source_port, destination_port, sequence, recognition, data_reserved = tcp_header[0], tcp_header[1], tcp_header[2], tcp_header[3], tcp_header[4]
+            source_port, destination_port, sequence, identification, data_reserved = tcp_header[0], tcp_header[1], tcp_header[2], tcp_header[3], tcp_header[4]
             tcp_header_length = data_reserved >> 4
             header_size = ip_header_unpacked_length + tcp_header_length * 4
             
@@ -143,37 +144,39 @@ class DarkSniffer:
             # If the target you're analyzing is using the https protocol, the information will obviously be encrypted. 
             # On the other hand, if the target you are scanning only uses http, the information will appear in plain text.
             data = tcp_package[header_size:]
-            data_saved = str(data)[0:50] 
-            package_info = [
-                package_number,
-                source_address,
-                destination_address,
-                (self.get_protocol(tcp_protocol))[0],
-                ip_header_version,
-                ip_header_length,
-                time_to_live,
-                source_port,
-                destination_port,
-                sequence,
-                recognition,
-                tcp_header_length,
-                data_saved,
-            ]
-            table.add_row(package_info)
-            package_number += 1
-        print(f'[+]\t:: Protocol   :  {(self.get_protocol(tcp_protocol))[0]}'
-                 f'\t:: IP Head. V :  {ip_header_version}' 
-                 f'\t:: IP Head. L.: {ip_header_length}')
+            data_b2a_hex = binascii.b2a_hex(data)
+            if data != b'':
+                data_saved = str(data)[0:190] 
+                package_info = [
+                    package_number,
+                    source_address,
+                    destination_address,
+                    (self.get_protocol(tcp_protocol))[0],
+                    ip_header_version,
+                    ip_header_length,
+                    time_to_live,
+                    source_port,
+                    destination_port,
+                    sequence,
+                    identification,
+                    tcp_header_length,
+                    data_saved,
+                ]
+                table.add_row(package_info)
+                package_number += 1
+        print(f'[+]\t:: Protocol : {(self.get_protocol(tcp_protocol))[0]}'
+              f' :: Destination addr : {destination_address}'
+              f' :: TCP Header Length : {tcp_header_length}'
+              f' :: IP Headader Version : {ip_header_version}' 
+              f' :: IP Header Length.: {ip_header_length}')
         print(table.get_string(fields=[
                 '#',
                 'Source',
-                'Destination',
                 'TTL',
                 'src p.',
                 'des p.',
                 'sequence',
-                'recognition',
-                'TCP H L',
+                'identification',
                 'data',
             ]))
         print('\nBye ..... OK!\n')
