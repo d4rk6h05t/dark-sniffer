@@ -10,7 +10,6 @@ We are not responsible for any damages. You are responsible for your own actions
 # Requirements
 The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
  And  **prettytable** & **getopt** packages.
-
 # Usage
 ```sh
 # Don't despair if it takes longer than my algorithm is optimized, 
