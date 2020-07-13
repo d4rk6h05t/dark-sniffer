@@ -23,17 +23,23 @@ import csv
 import time
 import json
 import getopt
-import binascii
+import datetime
+
+from struct import *
 import socket, sys, os
-from struct import * 
 from prettytable import PrettyTable, from_csv
 
 class DarkSniffer:
     
+    ETH_LENGTH = 14
+    ICMPH_LENGTH = 4
+    
     AMOUNT_PACKETS = 5
     
-    NO_PACKET = ['no_packet',]
+    NO_PACKET = ['no_packet','datetime']
     
+    ETH_HEADER = [ 'destination_mac_address', 'source_mac_address', 'eth_protocol', ]
+   
     PACKET_IP_HEADER = [
         'version', 'type_of_service', 'total_length', 'identification', 'fragment_Offset',
         'time_to_live', 'tcp_protocol', 'header_checksum', 'source_address', 'destination_address',
@@ -44,9 +50,12 @@ class DarkSniffer:
         'data_offset_reserved', 'tcp_flags', 'window', 'tcp_checksum', 'urgent_pointer',
     ]
     
-    PACKET_TCP_HEADER_DATA = ['data']
+    PACKET_ICMP_HEADER = [ 'icmp_type', 'code', 'checksum' ]
+   
+    METADATA_DATA = ['data']
     
-    PACKET_METADATA = NO_PACKET + PACKET_IP_HEADER + PACKET_TCP_HEADER + PACKET_TCP_HEADER_DATA
+    PACKET_TCP_METADATA = NO_PACKET + ETH_HEADER + PACKET_IP_HEADER + PACKET_TCP_HEADER + METADATA_DATA
+    PACKET_ICMP_METADATA = NO_PACKET + ETH_HEADER + PACKET_IP_HEADER + PACKET_ICMP_HEADER + METADATA_DATA
     
     def __init__(self,filename):
         self._filename = filename
@@ -75,13 +84,13 @@ class DarkSniffer:
     @staticmethod
     def usage():
         print (f' Usage: darksniffer [option] [args]\n'
-               f'\t-f \t--file <filename>   \t CSV file where a dictionary of the details of the intercepted pauqtes is stored \n'
+               f'\t-f \t--file <filename>   \t Set name to JSON, CSV file where the details of the intercepted packets is stored \n'
+               f'\t-c \t--customize         \t Customize packet capture arguments \n'
                f'\t-p \t--packets <amount>  \t Amount of packages to be captured \n'
                f'\t-e \t--empty-packet      \t Accept empty packages in the data field \n'
                f'\t-i \t--ip-header         \t Display the IP header struct \n'
                f'\t-t \t--tcp-header        \t Display the TCP header struct \n'
-               f'\t-d \t--details           \t Display the data in detail \n'
-               f'\t-u \t--url               \t Capture packets from url pattern target \n'
+               f'\t-j \t--json-details      \t Display the data in detail \n'
                f'\t-h \t--help              \t Display this help and exit\n'
                f'\t-v \t--version           \t Display version for more information\n')
     
@@ -104,48 +113,28 @@ class DarkSniffer:
         } 
         return protocols.get(number_protocol, 'number_protocol')
     
-    def display_metadata_packet(self,protocol,destination_address,tcp_header_length,ip_header_version,ip_header_length):
-        print(f'\n[+] :: protocol : {protocol}'
-             f' :: destination addr : {destination_address}'
-             f' :: TCP Header Length : {tcp_header_length}'
-             f' :: IP Headader Version : {ip_header_version}' 
-             f' :: IP Header Length.: {ip_header_length}\n')
-    
-    def display_details_packet(self,collect_packets):
-        for packet in collect_packets:
-            print(f'[{packet[0]}]  :: ==========  I P   H E A D E R   F O R M A T ========== ::')
-            print(f'[{packet[0]}]  :: IP Header Version : {packet[1]} \t'
-                                f' :: Type Of Service : {packet[2]} \t'
-                                f' :: IP HeaderTotal Length : {packet[3]} \t' 
-                                f' :: Idientification: {packet[4]} \t'
-                                f' :: Fragment offset : {packet[5]}')
-            print(f'[{packet[0]}]  :: Time to live : {packet[6]} \t'
-                                f' :: Protocol : {self.get_protocol(packet[7])} \t'
-                                f' :: Header Checksum : {packet[8]} \t' 
-                                f' :: Source Address: {packet[9]} \t'
-                                f' :: Destination Address: : {packet[10]}')
-            print(f'[{packet[0]}]  :: =========  T C P    H E A D E R   F O R M A T ========= ::')
-            print(f'[{packet[0]}]  :: Source Port : {packet[11]} \t' 
-                                f' :: Destination Port: {packet[12]} \t'
-                                f' :: Sequence number: {packet[13]} \t'
-                                f' :: Acknowledgment number: {packet[14]} \t'
-                                f' :: TCP Header length : {packet[15]} \t')
-            print(f'[{packet[0]}]  :: Data offset & reserved : {packet[16]} \t' 
-                                f' :: TCP Flags: {packet[17]} \t'
-                                f' :: Window: {packet[18]} \t'
-                                f' :: TCP Checksumr: {packet[19]} \t'
-                                f' :: Urgent Pointer : {packet[20]} \t')
-            print(f'[{packet[0]}]  :: Data:{packet[21]}\n')
-    
-    def save_packets_data(self,header,packets_data):
-        #collect_packets = {}
-        #dict.fromkeys(self.PACKET_METADATA)
-        with open(self._filename + '.csv', 'w') as csvfile:  
-            csv_writer = csv.writer(csvfile)  
+    def save_packets_json(self, header, packets_list):
+        collect_packets = { 'metadata_packet': [] }
+        for packets in packets_list:
+            packet = dict().fromkeys(header)
+            for (key,value), metadata in zip(packet.items(),packets):
+                if key == 'data':
+                    packet[key] = str(metadata)
+                else:
+                    packet[key] = metadata
+            collect_packets['metadata_packet'].append(packet)
+        json_collect_packets = json.dumps(collect_packets, indent = 4) 
+        with open(self._filename + '.json', 'w') as outfile: 
+            outfile.write(json_collect_packets) 
+        return json_collect_packets
+        
+    def save_packets_csv(self, header, packets_list):
+        with open(self._filename + '.csv', 'w') as outfile:  
+            csv_writer = csv.writer(outfile)  
             csv_writer.writerow(header)  
-            csv_writer.writerows(packets_data) 
+            csv_writer.writerows(packets_list) 
     
-    def load_progress_bar(self,packet_number, total_collect_packets):
+    def load_progress_bar(self, packet_number, total_collect_packets):
         prefix, suffix  = 'Loading...:', 'Progress:'
         if packet_number == total_collect_packets:
             prefix, suffix  = 'Ready ...:', 'Completed:'
@@ -155,6 +144,20 @@ class DarkSniffer:
         print(f'\r[+] :: {prefix} |{bar}|  {suffix:}{percent}% ({packet_number}/{total_collect_packets} collected packets)', end = '\r')
         if packet_number == total_collect_packets: 
             print()
+    
+    def unpack_eth_header(self, eth_header, destination_mac, source_mac):
+        eth_header_unpacked = unpack('!6s6sH',eth_header)
+        destination_mac_address = str(destination_mac)
+        source_mac_address = str(source_mac)
+        eth_protocol = socket.ntohs(eth_header_unpacked[2])
+        return [ destination_mac_address, source_mac_address, eth_protocol ]
+    
+    def unpack_icmp_packet(self, icmp_header):
+        icmp_header_unpacked = unpack('!BBH', icmp_header)
+        icmp_type = icmp_header_unpacked[0]
+        code = icmp_header_unpacked[1]
+        checksum = icmp_header_unpacked[2]
+        return [ icmp_type, code, checksum ]
     
     def unpack_ip_packet(self,ip_header):
         # At the moment, unpack them IP header
@@ -166,18 +169,18 @@ class DarkSniffer:
         ip_header_length = ip_header_length_version & 0xF
         ip_header_unpacked_length = ip_header_length * 4
         
-        # ttl [ Time to Live ] , TCP protocol, header checksum
+        # ttl [ Time to Live ] , protocol, header checksum, more
         version, type_of_service, total_length = ip_header_unpacked[0], ip_header_unpacked[1], ip_header_unpacked[2]
         identification, fragment_Offset, time_to_live = ip_header_unpacked[3], ip_header_unpacked[4], ip_header_unpacked[5]
-        tcp_protocol, header_checksum =  ip_header_unpacked[6], ip_header_unpacked[7] 
+        protocol, header_checksum =  ip_header_unpacked[6], ip_header_unpacked[7] 
         source_address,destination_address = socket.inet_ntoa(ip_header_unpacked[8]), socket.inet_ntoa(ip_header_unpacked[9])
         
         return ( ip_header_unpacked_length , [ 
             version, type_of_service, total_length, identification, fragment_Offset,
-            time_to_live, tcp_protocol, header_checksum, source_address, destination_address,  
-        ])
+            time_to_live, (self.get_protocol(protocol))[0], header_checksum, source_address, destination_address,  
+        ], protocol )
         
-    def unpack_tcp_packet(self,tcp_header,ip_header_unpacked_length,tcp_packet): 
+    def unpack_tcp_packet(self,tcp_header,ip_header_unpacked_length,packet): 
         # At the moment, unpack them TCP header
         tcp_header = unpack('!HHLLBBHHH' , tcp_header) 
         # Package metadata collection TCP header
@@ -190,13 +193,12 @@ class DarkSniffer:
         # Retrieve packet data TCP
         # If the target you're analyzing is using the https protocol, the information will obviously be encrypted. 
         # On the other hand, if the target you are scanning only uses http, the information will appear in plain text.
-        data = tcp_packet[header_size:]
-        data_b2a_hex = binascii.b2a_hex(data)
+        data = packet[header_size:]
         
         return [ source_port, destination_port, sequence_number, acknowledgment_number, tcp_header_length, 
-                data_offset_reserved, tcp_flags, window, tcp_checksum, urgent_pointer, data, ]
+                data_offset_reserved, tcp_flags, window, tcp_checksum, urgent_pointer, data ]
    
-    def collect_packets(self,total_collect_packets,empty_packet):
+    def collect_packets(self,total_collect_packets,empty_packet,protocol_enable):
         try:
             # AF_INET and AF_INET6 correspond to the protocol classification PF_INET and PF_INET6.
             # Which include standard IP and TCP and UDP port numbers. 
@@ -214,48 +216,103 @@ class DarkSniffer:
             if packet_number == total_collect_packets:
                 break
             # Receive data from the socket packetd. 
-            tcp_packet = server_socket.recvfrom(65565)
+            packet = server_socket.recvfrom(65565)
             # TCP packet, Take the first 20 characters for the IP header.
-            tcp_packet = tcp_packet[0] 
-            ip_header = tcp_packet[0:20] 
-    
+            packet = packet[0] 
+            ip_header = packet[0:20] 
+            eth_header = packet[:self.ETH_LENGTH]
+            
+            eth_header_unpacked = self.unpack_eth_header(eth_header,packet[0:6],packet[6:12])
+            
             ip_header_unpacked = self.unpack_ip_packet(ip_header)
             ip_header_unpacked_length = ip_header_unpacked[0] 
             ip_header_unpacked_struct = ip_header_unpacked[1]
-            tcp_header = tcp_packet[ip_header_unpacked_length:ip_header_unpacked_length + 20]
-            
-            tcp_header_unpacked = self.unpack_tcp_packet(tcp_header,ip_header_unpacked_length,tcp_packet)
-        
-            packet_info =  [ packet_number, ] + ip_header_unpacked_struct + tcp_header_unpacked
-            
-            if empty_packet == False:
-                collect_packets.append(packet_info)
-                packet_number += 1
-            else:
-                if tcp_header_unpacked[10] != b'':
-                    collect_packets.append(packet_info)
-                    packet_number += 1
-            
+            if protocol_enable == 'TCP':
+                # TCP Protocol
+                if ip_header_unpacked[2] == 6:
+                    tcp_header = packet[ip_header_unpacked_length:ip_header_unpacked_length + 20]
+                    tcp_header_unpacked = self.unpack_tcp_packet(tcp_header,ip_header_unpacked_length,packet)
+                    packet_info =  [ packet_number, str(datetime.datetime.now()), ] + eth_header_unpacked + ip_header_unpacked_struct + tcp_header_unpacked
+                
+                    if empty_packet == False:
+                        collect_packets.append(packet_info)
+                        packet_number += 1
+                    else:
+                        if tcp_header_unpacked[10] != b'':
+                            collect_packets.append(packet_info)
+                            packet_number += 1
+            elif protocol_enable == 'ICMP':
+                # ICMP Protocol
+                if ip_header_unpacked[2] == 1:
+                    x = ip_header_unpacked_length + self.ETH_LENGTH
+                    icmp_header = packet[x:( x + 4 )]
+                    icmp_header_unpacked = self.unpack_icmp_packet(icmp_header)
+                    header_size = self.ETH_LENGTH + ip_header_unpacked_length + self.ICMPH_LENGTH
+                    data = packet[header_size:]
+                    packet_info =  [ packet_number, str(datetime.datetime.now()), ] + eth_header_unpacked + ip_header_unpacked_struct + icmp_header_unpacked + [ data ]
+                
+                    if empty_packet == False:
+                        collect_packets.append(packet_info)
+                        packet_number += 1
+                    else:
+                        if data != b'':
+                            collect_packets.append(packet_info)
+                            packet_number += 1
+                      
         return collect_packets
              
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv,'hfpeitduv',['help','file','packets','empty-packet','ip-header','tcp-header','details','url','version'])
+        opts, args = getopt.getopt(argv, 'hcfpeitjv', [
+            'help','customize','file','packets','empty-packet','ip-header','tcp-header','json-details','version'
+        ])
         darksniffer = DarkSniffer('collect_packets')
         amount_packets = darksniffer.AMOUNT_PACKETS
-        table = PrettyTable()
-        table.field_names = darksniffer.PACKET_METADATA
+        current_protocol = darksniffer.PACKET_TCP_METADATA
         empty_packet = packet_details = False
+        protocol_packets = 'TCP'
+        target_hostname = 'google.com'
         display_fields = ['no_packet','source_address','source_port','destination_port','time_to_live','fragment_Offset','sequence_number','acknowledgment_number']
     except getopt.GetoptError:
         DarkSniffer.usage()
         sys.exit(2)
-        
+    
     for opt, arg in opts:
+        
         if opt in ('-h', '--help'):
-            DarkSniffer.banner()
             DarkSniffer.usage()
             sys.exit()
+        
+        elif opt in ('-c', '--customize'):
+            DarkSniffer.banner()
+            darksniffer.filename = str(input('[+]  ::  Enter a filename to JSON & CSV file : '))
+            amount_packets = int(input('[+]  ::  Enter amount packets to capture : '))
+            print(f'[+] :: Warning: Be very careful when choosing ICMP as you need to perform some action\n' 
+                  f'[+] :: that will trigger the sending of packages of this protocol. \n'
+                  f'[+] :: If you dont receive ICMP protocol packages, immediately kill the program with crtl + c')
+            protocol_packets = str(input('[+]  ::  Enter protocol packets to capture [TCP/ICMP]: ')).upper()
+            
+            if protocol_packets == 'ICMP':
+                current_protocol = darksniffer.PACKET_ICMP_METADATA
+            
+            response_empty_packet = str(input('[+]  ::  Accept empty packets [Y/N]: '))
+            if response_empty_packet == 'Y' or response_empty_packet == 'y':
+                empty_packet = True
+            
+            response_view_json = str(input('[+]  ::  View mode JSON File [Y/N]: '))
+            if response_view_json == 'Y' or response_view_json == 'y':
+                packet_details = True
+                break
+            else:
+                print('IP  Header: ', darksniffer.NO_PACKET + darksniffer.PACKET_IP_HEADER)
+                print('TCP Header: ', darksniffer.NO_PACKET + darksniffer.PACKET_TCP_HEADER)
+                response_view_table = (str(input('[+]  ::  View mode data in the table packet struct [IP/TCP] : '))).upper()
+                if response_view_table == 'IP':
+                    display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_IP_HEADER
+                elif response_view_table == 'TCP':
+                    display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_TCP_HEADER
+                else:
+                    break
         elif opt in ('-f', '--file'):
             darksniffer.filename = argv[1]
         elif opt in ('-p', '--packets'):
@@ -266,27 +323,29 @@ def main(argv):
             display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_IP_HEADER
         elif opt in ('-t', '--tcp-header'):
             display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_TCP_HEADER
-        elif opt in ('-d', '--details'):
+        elif opt in ('-j', '--json-details'):
             packet_details = True
-        elif opt in ('-u', '--url'):
-            print('Here your url or address target!')
         elif opt in ('-v', '--version'):
            DarkSniffer.banner()
+           DarkSniffer.usage()
+           print(f'This program may be freely redistributed under'
+                 f'the terms of the GNU General Public License (GLP V3).')
            sys.exit()
-        
-    collect_packets = darksniffer.collect_packets(amount_packets,empty_packet)
-    darksniffer.save_packets_data(darksniffer.PACKET_METADATA, collect_packets)
-
+    
+    table = PrettyTable()
+    table.field_names = current_protocol
+    collect_packets = darksniffer.collect_packets(amount_packets,empty_packet,protocol_packets)
+    darksniffer.save_packets_csv(current_protocol, collect_packets)
+    packets_json = darksniffer.save_packets_json(current_protocol, collect_packets)
+    
     for packet_info in collect_packets: 
         table.add_row(packet_info)
-        
-    # tmp collect_packets change positions
-    darksniffer.display_metadata_packet(collect_packets[0][3],collect_packets[0][2],collect_packets[0][12],collect_packets[0][4],collect_packets[0][5])
     
+    #print(packets_json)
     if packet_details == False :
         print(table.get_string(fields = display_fields ))
     else:
-        darksniffer.display_details_packet(collect_packets)
+        print(packets_json)
         
     sys.exit()
     
