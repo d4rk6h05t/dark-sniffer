@@ -6,8 +6,8 @@ __github__  = 'https://github.com/d4rk6h05t/dark-sniffer'
 __email__   = 'd4rk6h05t_0d4y5@protonmail.ch'
 __license__ = 'GPL V3'
 """
-We point out that the hacking related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only.
-We are not responsible for any damages. You are responsible for your own actions.
+I point out that the hacking-related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only. 
+You are responsible for your own actions.
 
 DarkSniffer [ small DarkSniffer only TCP incoming packet ]
 Sniffers are programs that can capture/sniff/detect packet of network traffic per packet and analyze
