@@ -9,13 +9,13 @@ I point out that the hacking-related material found in the github account (d4rk6
 
 # Requirements
 The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
- And  **prettytable** & **getopt** packages.
+ And  **prettytable** package.
 # installation & Usage
 ```sh
 # Don't despair if it takes longer than my algorithm is optimized, 
 # Remember you have to navigate a bit to see your local traffic
 # You can install keyboard package with pip or pip3
-$ pip install prettytable getopt
+$ pip install prettytable
 # clone the repository
 $ git clone https://github.com/d4rk6h05t/dark-sniffer.git
 # access the project directory
