@@ -28,13 +28,13 @@ $ sudo ./darksniffer.py -h
 [+] :: By: d4rk6h05t [Michani. M. De La Calleja E.]  :: An small 5n1ff3r v1.0.0
 
  Usage: darksniffer [option] [args]
-	-f 	--file <filename>   	 JSON file where a dictionary of the details of the intercepted pauqtes is stored 
+	-f 	--file <filename>   	 Set name to JSON, CSV file where the details of the intercepted packets is stored 
+	-c 	--customize         	 Customize packet capture arguments 
 	-p 	--packets <amount>  	 Amount of packages to be captured 
 	-e 	--empty-packet      	 Accept empty packages in the data field 
 	-i 	--ip-header         	 Display the IP header struct 
 	-t 	--tcp-header        	 Display the TCP header struct 
-	-d 	--details           	 Display the data in detail 
-	-u 	--url               	 Capture packets from url pattern target 
+	-j 	--json-details      	 Display the data in detail 
 	-h 	--help              	 Display this help and exit
 	-v 	--version           	 Display version for more information
 
