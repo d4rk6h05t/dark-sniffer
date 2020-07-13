@@ -19,6 +19,8 @@ $ pip install prettytable getopt
 $ sudo python darksniffer.py --help
 # or also you can use
 $ sudo ./darksniffer.py -h
+# for convenience use the custom mode to edit all the necessary arguments
+$ sudo ./darksniffer.py -c
 ███████╗ █████╗ ██████╗ ██╗  ██╗     ███████╗███╗  ██╗██████╗██████╗██████╗███████╗██████╗ 
 ██╔═══█║██╔══██╗██╔══██╗██║ ██╔╝     ██╔════╝████╗ ██║╚═██╔═╝██╔═══╝██╔═══╝██╔════╝██╔══██╗
 ██║   █║███████║██████╔╝█████╔╝█████╗███████╗██╔██╗██║  ██║  ██████╗██████╗█████╗  ██████╔╝
