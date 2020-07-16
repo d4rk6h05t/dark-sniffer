@@ -124,6 +124,9 @@ class DarkSniffer:
         return protocols.get(number_protocol, 'number_protocol')
     
     def mac(self,octet):
+        """
+        Converts byte octect into mac address format
+        """
         mac = binascii.hexlify(octet)
         mac = list(str((mac).decode('utf-8')))
         for i in [2,5,8,11,14]:
@@ -131,6 +134,10 @@ class DarkSniffer:
         return ''.join(mac)
     
     def save_packets_json(self, header, packets_list):
+        """
+        Receives a list of captured packets and creates a dictionary (JSON) 
+        of captured packets and stores them in a .json file
+        """
         collect_packets = { 'metadata_packet': [] }
         for packets in packets_list:
             packet = dict().fromkeys(header)
@@ -146,12 +153,18 @@ class DarkSniffer:
         return json_collect_packets
         
     def save_packets_csv(self, header, packets_list):
+        """
+        Receives a list of captured packets and stores them in a .csv file
+        """
         with open(self._filename + '.csv', 'w') as outfile:  
             csv_writer = csv.writer(outfile)  
             csv_writer.writerow(header)  
             csv_writer.writerows(packets_list) 
     
     def load_progress_bar(self, packet_number, total_collect_packets):
+        """
+        Progress bar of captured packets 
+        """
         prefix, suffix  = 'Loading...:', 'Progress:'
         if packet_number == total_collect_packets:
             prefix, suffix  = 'Ready ...:', 'Completed:'
@@ -163,6 +176,14 @@ class DarkSniffer:
             print()
     
     def unpack_eth_packet(self, eth_header, destination_mac, source_mac):
+        """
+        Unpacking of the eth header 
+        [ ! + 6s6sH ] = (
+            ('destination_mac_address', '6s', ''),
+            ('source_mac_address', '6s', ''), 
+            ('eth_protocol', 'H', 2048)
+        )
+        """
         eth_header_unpacked = unpack('!6s6sH',eth_header)
         destination_mac_address = self.mac(destination_mac)
         source_mac_address = self.mac(source_mac)
@@ -170,6 +191,14 @@ class DarkSniffer:
         return [ destination_mac_address, source_mac_address, eth_protocol ]
     
     def unpack_icmp_packet(self, icmp_header):
+        """
+        Unpacking of the ICMP header
+        [ ! + BBH ] = (
+            ('type', 'B', 8),
+            ('code', 'B', 0),
+            ('checksum', 'H', 0)
+        ) 
+        """
         icmp_header_unpacked = unpack('!BBH', icmp_header)
         icmp_type = icmp_header_unpacked[0]
         code = icmp_header_unpacked[1]
@@ -177,13 +206,36 @@ class DarkSniffer:
         return [ icmp_type, code, checksum ]
     
     def unpack_udp_packet(self, udp_header):
+        """
+        Unpacking of the UDP header
+        [ ! + HHHH ] =  (
+            ('source_port', 'H', 57005),
+            ('destination_port', 'H', 0),
+            ('u_length', 'H', 8),
+            ('checksum', 'H', 0)
+        )   
+        """
         udp_header =  unpack('!HHHH', udp_header)
         source_port, destination_port = udp_header[0], udp_header[1]
-        length, checksum = udp_header[2], udp_header[3]
-        return [ source_port, destination_port, length, checksum ]
+        u_length, checksum = udp_header[2], udp_header[3]
+        return [ source_port, destination_port, u_length, checksum ]
     
     def unpack_ip_packet(self,ip_header):
-        # At the moment, unpack them IP header
+        """
+        Unpacking of the IP header
+        [! + BBHHHBBH4s4s] = (
+            ('ip_header_length_version', 'B', 69),
+            ('type_of_service', 'B', 0),
+            ('total_length', 'H', 20),
+            ('identification', 'H', 0),
+            ('fragment_Offset', 'H', 0),
+            ('time_to_live', 'B', 64),
+            ('protocol', 'B', 0),
+            ('header_checksum', 'H', 0)
+            ('source_address', '4s', 0)
+            ('destination_address', '4s', 0)
+        )
+        """
         ip_header_unpacked = unpack('!BBHHHBBH4s4s', ip_header) 
         
         # TCP IP packet metadata collection
@@ -204,7 +256,19 @@ class DarkSniffer:
         ], protocol )
         
     def unpack_tcp_packet(self,tcp_header,ip_header_unpacked_length,packet): 
-        # At the moment, unpack them TCP header
+        """
+        Unpacking of the TCP header
+        [ ! + HHLLBBHHH ] = (
+            ('destination_port', 'H', 0),
+            ('sequence_number', 'I', 3735928559L),
+            ('acknowledgment_number', 'I', 0),
+            ('data_offset_reserved', 'B', 80),
+            ('tcp_flags', 'B', 2),
+            ('window', 'H', 65535),
+            ('checksum', 'H', 0),
+            ('urgent_pointer', 'H', 0)
+        )
+        """
         tcp_header = unpack('!HHLLBBHHH' , tcp_header) 
         # Package metadata collection TCP header
         source_port, destination_port, sequence_number, acknowledgment_number = tcp_header[0], tcp_header[1], tcp_header[2], tcp_header[3]
@@ -222,10 +286,13 @@ class DarkSniffer:
                 data_offset_reserved, tcp_flags, window, tcp_checksum, urgent_pointer, data ]
    
     def capture_packets(self,total_collect_packets,empty_packet,protocol_enable):
+        """
+        Packet capture mode, until the desired number of packets is reached
+        AF_INET and AF_INET6 correspond to the protocol classification PF_INET and PF_INET6.
+        Which include standard IP and TCP and UDP port numbers. 
+        Create a raw socket and bind it to the public interface
+        """
         try:
-            # AF_INET and AF_INET6 correspond to the protocol classification PF_INET and PF_INET6.
-            # Which include standard IP and TCP and UDP port numbers. 
-            # Create a raw socket and bind it to the public interface
             collect_packets = list()
             
             if protocol_enable == 'TCP':
