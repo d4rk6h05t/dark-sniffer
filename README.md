@@ -42,17 +42,24 @@ $ sudo ./darksniffer.py -c
 ███████║█ ║  ██║██║  ██║██║  ██╗     ███████║██║ ╚═██║██████╗██║    ██║    ███████╗██║  ██║
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚═╝   ╚═╝╚═════╝╚═╝    ╚═╝    ╚══════╝╚═╝  ╚═╝
 [+] :: By: d4rk6h05t [Michani. M. De La Calleja E.]  :: An small 5n1ff3r v1.0.0
+Usage: sudo ./darksniffer.py [options] [args]
 
- Usage: darksniffer [option] [args]
-	-f 	--file <filename>   	 Set name to JSON, CSV file where the details of the intercepted packets is stored 
-	-c 	--customize         	 Customize packet capture arguments 
-	-p 	--packets <amount>  	 Amount of packages to be captured 
-	-e 	--empty-packet      	 Accept empty packages in the data field 
-	-i 	--ip-header         	 Display the IP header struct 
-	-t 	--tcp-header        	 Display the TCP header struct 
-	-j 	--json-details      	 Display the data in detail 
-	-h 	--help              	 Display this help and exit
-	-v 	--version           	 Display version for more information
+Options:
+  -h, --help            show this help message and exit
+  -c FILENAME_CSV, --csv-file=FILENAME_CSV
+                        Save details into CSV file where the details of the
+                        intercepted packets
+  -j FILENAME_JSON, --json-file=FILENAME_JSON
+                        Save details into JSON file where the details of the
+                        intercepted packets
+  -i, --interactive     Customize packet capture arguments
+  -p PACKETS, --packets=PACKETS
+                        Amount of packages to be captured
+  -P PROTOCOL, --protocol=PROTOCOL
+                        Select a specific trotocol [TCP/ICMP/UDP]
+  -e, --empty-packet    Accept empty packages in the data field
+  -d, --details-json    Display the data in detail in JSON Format
+  -v, --version         Display version for more information
 
 ```
 
