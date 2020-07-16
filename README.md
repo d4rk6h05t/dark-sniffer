@@ -15,6 +15,8 @@ If you don't want to install python3.8 on your main operating system, you can in
 ```sh
 # Don't despair if it takes longer than my algorithm is optimized, 
 # Remember you have to navigate a bit to see your local traffic
+# If you don't specify the number of packets, by default it only captures 5 packets
+# If you don't specify the protocol, by default I cathurate only TCP packets
 # You can install keyboard package with pip or pip3
 $ pip install PTable
 
