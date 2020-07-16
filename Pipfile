@@ -5,8 +5,7 @@ name = "pypi"
 
 [packages]  
 pipfile = "*"
-getopt = "*"
-prettytable = "*"
+PTable = "*"
 
 [requires]
 python_version = "3.8"

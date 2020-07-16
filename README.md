@@ -2,30 +2,39 @@
 [![GitHub release](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/d4rk6h05t/dark-sniffer)
 
 # Dark-sniffer
-Sniffer [ small Sniffer only TCP incoming package ] Sniffers are programs that can capture/sniff/detect packets of network traffic per packet and analyze additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script. This tool makes you think about forcing the use of https protocol instead of traditional http. In your projects.
+Sniffer [ small Sniffer only TCP/ICMP/UDP incoming package ] Sniffers are programs that can capture/sniff/detect packets of network traffic per packet and analyze additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script. This tool makes you think about forcing the use of https protocol instead of traditional http. In your projects.
 
 # Disclaimer
 I point out that the hacking-related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only. You are responsible for your own actions.
 
 # Requirements
-The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
- And  **prettytable** package.
+The project can be used with **python3.8** for to build. However, it requires **python3.5** as minimum. And  **Ptable** package. 
+If you don't want to install python3.8 on your main operating system, you can install python3.8 on a virtual environment you can use **virtualenv** or **pipenv**
+
 # installation & Usage
 ```sh
 # Don't despair if it takes longer than my algorithm is optimized, 
 # Remember you have to navigate a bit to see your local traffic
 # You can install keyboard package with pip or pip3
-$ pip install prettytable
+$ pip install PTable
+
 # clone the repository
 $ git clone https://github.com/d4rk6h05t/dark-sniffer.git
+
 # access the project directory
 $ cd dark-sniffer
+
+# Remember,  you must be root or put the sudo command first to raise your permission level
 # ready ! you can try dark-sniffer
 $ sudo python darksniffer.py --help
+
 # or also you can use
 $ sudo ./darksniffer.py -h
+
+# remember to navigate a little bit somewhere specific to speed up the capture of packets
 # for convenience use the custom mode to edit all the necessary arguments
 $ sudo ./darksniffer.py -c
+
 ███████╗ █████╗ ██████╗ ██╗  ██╗     ███████╗███╗  ██╗██████╗██████╗██████╗███████╗██████╗ 
 ██╔═══█║██╔══██╗██╔══██╗██║ ██╔╝     ██╔════╝████╗ ██║╚═██╔═╝██╔═══╝██╔═══╝██╔════╝██╔══██╗
 ██║   █║███████║██████╔╝█████╔╝█████╗███████╗██╔██╗██║  ██║  ██████╗██████╗█████╗  ██████╔╝
@@ -46,12 +55,7 @@ $ sudo ./darksniffer.py -c
 	-v 	--version           	 Display version for more information
 
 ```
-# Intro to Transmission Control Protocol (TCP)
-The Transmission Control Protocol (TCP) is used as a a host-to-host protocol between hosts on a computer for packet switching,
-communication networks and in systems interconnected between networks.
-For more info you can visit [RFC 793](https://tools.ietf.org/html/rfc793) & [RFC 3168](https://tools.ietf.org/html/rfc3168)
-The different layers of abstraction are shown below. the figures were obtained from the previously published link
-                            
+
                             Protocol Layering
 
                         +---------------------+
@@ -81,9 +85,14 @@ The different layers of abstraction are shown below. the figures were obtained f
               +---------------------------+
               |   Local Network Protocol  |    Network Level
               +---------------------------+
+
+# Intro to (TCP) Transmission Control Protocol 
+The Transmission Control Protocol (TCP) is used as a a host-to-host protocol between hosts on a computer for packet switching,
+communication networks and in systems interconnected between networks. For more info you can visit [RFC 793](https://tools.ietf.org/html/rfc793)
+The different layers of abstraction are shown below. The figures were obtained from the previously published link.
+
               
-              
-                                TCP Header Format
+                        TCP Header Format
      
      0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -105,6 +114,45 @@ The different layers of abstraction are shown below. the figures were obtained f
     |                             data                              |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# Intro to (ICMP) Internet Control Message Protocol
+The Internet Control Message Protocol (ICMP) is a protocol based on the collection of Internet protocols.
+It is used in network devices, including routers, etc. For more info you can visit [RFC 792](https://tools.ietf.org/html/rfc792)
+The figures were obtained from the previously published link.
+
+                Internet Control Message Header Format
+    
+     0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |     Type      |     Code      |          Checksum             |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                             unused                            |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |      Internet Header + 64 bits of Original Data Datagram      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
+
+
+# Intro to (UDP) User  Datagram Protocol
+The User Datagram Protocol (UDP) is one of the main protocols in the Internet protocol suite.
+In UDP it defines the ability to send messages, in this case called datagrams,
+to other host computers on an Internet Protocol (IP) network. For more info you can visit [RFC_768](https://tools.ietf.org/html/rfc768)
+The figures were obtained from the previously published link.
+                        
+                        User Datagram Header Format
+    
+                  0      7 8     15 16    23 24    31
+                 +--------+--------+--------+--------+
+                 |     Source      |   Destination   |
+                 |      Port       |      Port       |
+                 +--------+--------+--------+--------+
+                 |                 |                 |
+                 |     Length      |    Checksum     |
+                 +--------+--------+--------+--------+
+                 |                                   |
+                 |          data octets ...          |
+                 +-----------------------------------+
+
 # Additional remarks
 This project is just a simple sniffer with many limitations, if you really want to analyze packages with more depth I recommend you to see projects like [tcpdump](https://www.tcpdump.org/) and [wireshark](https://www.wireshark.org/). 
 
@@ -121,3 +169,5 @@ By: d4rk6h05t (Michani. M. De La Calleja E.)
 GNU Lesser General Public License v3.0
 
 Oh Yeah! Free Software,  it's great, enjoy!
+
+This program may be freely redistributed under the terms of the GNU General Public License (GLPv3).
