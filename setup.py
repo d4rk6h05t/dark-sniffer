@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-LONG_DESCRIPTION = '''Sniffer [ small Sniffer only TCP/ICPM/UDP incoming package ] Sniffers are programs that can capture/sniff/detect packets of network traffic per packet and analyze additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script. This tool makes you think about forcing the use of https protocol instead of traditional http. In your projects.'''
+LONG_DESCRIPTION = '''Sniffer [ small Sniffer only TCP/ICPM/UDP incoming package ] Sniffers are programs that can capture/sniff/detect packets of network traffic per packet and analyze additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script. This tool makes you think about forcing the use of https protocol instead of traditional http. In your projects. Aditional Note: By default it only captures 5 packets and by default I cathurate only TCP packets'''
 
 setup(
     name = 'darksniffer',

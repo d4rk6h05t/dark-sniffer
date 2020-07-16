@@ -17,8 +17,18 @@ If you don't want to install python3.8 on your main operating system, you can in
 # Remember you have to navigate a bit to see your local traffic
 # If you don't specify the number of packets, by default it only captures 5 packets
 # If you don't specify the protocol, by default I cathurate only TCP packets
+
+# If you are using virtualenv or simply want to install the package, 
+# you can use either of these 2 commands, they both have the same purpose
+
 # You can install keyboard package with pip or pip3
 $ pip install PTable
+
+# Or 
+$ pip install -r requirements.txt
+
+# Or if you are using pipfile you can install the package using the following command
+$ pipenv install
 
 # clone the repository
 $ git clone https://github.com/d4rk6h05t/dark-sniffer.git
