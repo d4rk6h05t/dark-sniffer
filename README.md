@@ -38,10 +38,10 @@ $ pipenv install
 
 # Remember,  you must be root or put the sudo command first to raise your permission level
 # ready ! you can try dark-sniffer
-$ sudo python darksniffer.py --help
+$ python darksniffer.py --help
 
-# or also you can use
-$ sudo ./darksniffer.py -h
+# or also you can use for display usage
+$ ./darksniffer.py -h
 
 # remember to navigate a little bit somewhere specific to speed up the capture of packets
 # for convenience use the custom mode to edit all the necessary arguments
