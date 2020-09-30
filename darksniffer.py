@@ -33,6 +33,12 @@ from struct import *
 from optparse import OptionParser
 from prettytable import PrettyTable, from_csv
 
+from protocols.IP import IP
+from protocols.TCP import TCP
+from protocols.UDP import UDP
+from protocols.ICMP import ICMP
+from protocols.Ethernet import Ethernet 
+
 class DarkSniffer:
     
     ETH_LENGTH = 14
@@ -91,48 +97,6 @@ class DarkSniffer:
               sep = '\n')
         print(f'[+] :: By: {__author__}  :: An small 5n1ff3r {__version__}\n')
     
-    def get_protocol(self,number_protocol):
-        """
-        based in IP protocol numbers found in the protocol field of the IPv4 header
-        for more info: https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
-        Currently the most commonly used protocol is TCP but there may be exceptions 
-        return a list with protocol, small description and rfc
-        """
-        protocols = { 
-             0: ['HOPOPT','IPv6 Hop-by-Hop Option','8200'], 
-             1: ['ICMP', 'Internet Control Message protocol','792'], 
-             2: ['IGMP', 'Internet Group Management protocol','1112'],
-             3: ['GGP', 'Gateway-to-Gateway protocol', '823'], 
-             4: ['IP-in-IP', 'IP in IP (encapsulation)', '2003'], 
-             5: ['ST', 'Internet Stream protocol', '1190,1819'],
-             6: ['TCP', 'Transmission Control protocol', '793'],
-             7: ['CBT', 'Core-based trees', '2189'],
-             8: ['EGP', 'Exterior Gateway protocol', '888'],
-             9: ['IGP', 'Interior Gateway protocol', ''],
-            10: ['BBN-RCC-MON','BBN RCC Monitoring',''],
-            11: ['NVP-II','Network Voice Protocol','741'],
-            12: ['PUP','Xerox PUP',''],
-            13: ['ARGUS','ARGUS',''],
-            14: ['EMCON','EMCON',''],
-            15: ['XNET','Cross Net Debugger',''],
-            16: ['CHAOS','Chaos',''],
-            17: ['UDP','User Datagram Protocol','768'],
-            18: ['MUX','Multiplexing',''],
-            19: ['DCN-MEAS','DCN Measurement Subsystems',''],
-            20: ['HMP','Host Monitoring Protocol',''],
-        } 
-        return protocols.get(number_protocol, 'number_protocol')
-    
-    def mac(self,octet):
-        """
-        Converts byte octect into mac address format
-        """
-        mac = binascii.hexlify(octet)
-        mac = list(str((mac).decode('utf-8')))
-        for i in [2,5,8,11,14]:
-            mac.insert(i,':')
-        return ''.join(mac)
-    
     def save_packets_json(self, header, packets_list):
         """
         Receives a list of captured packets and creates a dictionary (JSON) 
@@ -174,116 +138,6 @@ class DarkSniffer:
         print(f'\r[+] :: {prefix} |{bar}|  {suffix:}{percent}% ({packet_number}/{total_collect_packets} collected packets)', end = '\r')
         if packet_number == total_collect_packets: 
             print()
-    
-    def unpack_eth_packet(self, eth_header, destination_mac, source_mac):
-        """
-        Unpacking of the eth header 
-        [ ! + 6s6sH ] = (
-            ('destination_mac_address', '6s', ''),
-            ('source_mac_address', '6s', ''), 
-            ('eth_protocol', 'H', 2048)
-        )
-        """
-        eth_header_unpacked = unpack('!6s6sH',eth_header)
-        destination_mac_address = self.mac(destination_mac)
-        source_mac_address = self.mac(source_mac)
-        eth_protocol = socket.ntohs(eth_header_unpacked[2])
-        return [ destination_mac_address, source_mac_address, eth_protocol ]
-    
-    def unpack_icmp_packet(self, icmp_header):
-        """
-        Unpacking of the ICMP header
-        [ ! + BBH ] = (
-            ('type', 'B', 8),
-            ('code', 'B', 0),
-            ('checksum', 'H', 0)
-        ) 
-        """
-        icmp_header_unpacked = unpack('!BBH', icmp_header)
-        icmp_type = icmp_header_unpacked[0]
-        code = icmp_header_unpacked[1]
-        checksum = icmp_header_unpacked[2]
-        return [ icmp_type, code, checksum ]
-    
-    def unpack_udp_packet(self, udp_header):
-        """
-        Unpacking of the UDP header
-        [ ! + HHHH ] =  (
-            ('source_port', 'H', 57005),
-            ('destination_port', 'H', 0),
-            ('u_length', 'H', 8),
-            ('checksum', 'H', 0)
-        )   
-        """
-        udp_header =  unpack('!HHHH', udp_header)
-        source_port, destination_port = udp_header[0], udp_header[1]
-        u_length, checksum = udp_header[2], udp_header[3]
-        return [ source_port, destination_port, u_length, checksum ]
-    
-    def unpack_ip_packet(self,ip_header):
-        """
-        Unpacking of the IP header
-        [! + BBHHHBBH4s4s] = (
-            ('ip_header_length_version', 'B', 69),
-            ('type_of_service', 'B', 0),
-            ('total_length', 'H', 20),
-            ('identification', 'H', 0),
-            ('fragment_Offset', 'H', 0),
-            ('time_to_live', 'B', 64),
-            ('protocol', 'B', 0),
-            ('header_checksum', 'H', 0)
-            ('source_address', '4s', 0)
-            ('destination_address', '4s', 0)
-        )
-        """
-        ip_header_unpacked = unpack('!BBHHHBBH4s4s', ip_header) 
-        
-        # TCP IP packet metadata collection
-        ip_header_length_version = ip_header_unpacked[0]
-        ip_header_version = ip_header_length_version >> 4
-        ip_header_length = ip_header_length_version & 0xF
-        ip_header_unpacked_length = ip_header_length * 4
-        
-        # ttl [ Time to Live ] , protocol, header checksum, more
-        version, type_of_service, total_length = ip_header_unpacked[0], ip_header_unpacked[1], ip_header_unpacked[2]
-        identification, fragment_Offset, time_to_live = ip_header_unpacked[3], ip_header_unpacked[4], ip_header_unpacked[5]
-        protocol, header_checksum =  ip_header_unpacked[6], ip_header_unpacked[7] 
-        source_address,destination_address = socket.inet_ntoa(ip_header_unpacked[8]), socket.inet_ntoa(ip_header_unpacked[9])
-        
-        return ( ip_header_unpacked_length , [ 
-            version, type_of_service, total_length, identification, fragment_Offset,
-            time_to_live, (self.get_protocol(protocol))[0], header_checksum, source_address, destination_address,  
-        ], protocol )
-        
-    def unpack_tcp_packet(self,tcp_header,ip_header_unpacked_length,packet): 
-        """
-        Unpacking of the TCP header
-        [ ! + HHLLBBHHH ] = (
-            ('destination_port', 'H', 0),
-            ('sequence_number', 'I', 3735928559L),
-            ('acknowledgment_number', 'I', 0),
-            ('data_offset_reserved', 'B', 80),
-            ('tcp_flags', 'B', 2),
-            ('window', 'H', 65535),
-            ('checksum', 'H', 0),
-            ('urgent_pointer', 'H', 0)
-        )
-        """
-        tcp_header = unpack('!HHLLBBHHH' , tcp_header) 
-        # Package metadata collection TCP header
-        source_port, destination_port, sequence_number, acknowledgment_number = tcp_header[0], tcp_header[1], tcp_header[2], tcp_header[3]
-        data_offset_reserved, tcp_flags, window, tcp_checksum, urgent_pointer = tcp_header[4] ,tcp_header[5], tcp_header[6], tcp_header[7], tcp_header[8]
-        tcp_header_length = data_offset_reserved >> 4
-        
-        header_size = ( ip_header_unpacked_length + ( tcp_header_length * 4 ) )
-        
-        # Retrieve packet data TCP
-        # If the target you're analyzing is using the https protocol, the information will obviously be encrypted. 
-        # On the other hand, if the target you are scanning only uses http, the information will appear in plain text.
-        data = packet[header_size:]
-        
-        return [ source_port, destination_port, sequence_number, acknowledgment_number, tcp_header_length, 
-                data_offset_reserved, tcp_flags, window, tcp_checksum, urgent_pointer, data ]
    
     def capture_packets(self,total_collect_packets,empty_packet,protocol_enable):
         """
@@ -317,9 +171,11 @@ class DarkSniffer:
             ip_header = packet[0:20] 
             
             eth_header = packet[:self.ETH_LENGTH]
-            eth_header_unpacked = self.unpack_eth_packet(eth_header,packet[0:6],packet[6:12])
+            eth_header_packet = Ethernet(eth_header,packet[0:6],packet[6:12])
+            eth_header_unpacked = eth_header_packet.get_attributes() 
             
-            ip_header_unpacked = self.unpack_ip_packet(ip_header)
+            ip_header_packet = IP(ip_header)
+            ip_header_unpacked = ip_header_packet.get_attributes()
             ip_header_unpacked_length = ip_header_unpacked[0] 
             ip_header_unpacked_struct = ip_header_unpacked[1]
             
@@ -330,7 +186,8 @@ class DarkSniffer:
                 if ip_header_unpacked[2] == 6:
                     
                     tcp_header = packet[ip_header_unpacked_length:ip_header_unpacked_length + 20]
-                    tcp_header_unpacked = self.unpack_tcp_packet(tcp_header,ip_header_unpacked_length,packet)
+                    tcp_header_packet = TCP(tcp_header,ip_header_unpacked_length,packet)
+                    tcp_header_unpacked = tcp_header_packet.get_attributes()
                     packet_info =  [ packet_number, str(datetime.datetime.now()), ] + eth_header_unpacked + ip_header_unpacked_struct + tcp_header_unpacked
                 
                     if empty_packet == False:
@@ -346,7 +203,8 @@ class DarkSniffer:
                 if ip_header_unpacked[2] == 1:
                     
                     icmp_header = packet[x:( x + 4 )]
-                    icmp_header_unpacked = self.unpack_icmp_packet(icmp_header)
+                    icmp_header_packet = ICMP(icmp_header)
+                    icmp_header_unpacked = icmp_header_packet.get_attributes()
                     header_size = self.ETH_LENGTH + ip_header_unpacked_length + self.ICMP_HEADER_LENGTH
                     data = packet[header_size:]
                     packet_info =  [ packet_number, str(datetime.datetime.now()), ] + eth_header_unpacked + ip_header_unpacked_struct + icmp_header_unpacked + [ data ]
@@ -364,7 +222,9 @@ class DarkSniffer:
                 if ip_header_unpacked[2] == 17:
                     
                     udp_header = packet[x:( x + 8)]
-                    udp_header_unpacked = self.unpack_udp_packet(udp_header)
+                    udp_header_packet = UDP(udp_header)
+                    udp_header_unpacked = udp_header_packet.get_attributes()
+                    
                     header_size = self.ETH_LENGTH + ip_header_unpacked_length + self.UDP_HEADER_LENGTH
                     data = packet[header_size:]
                     
