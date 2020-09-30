@@ -18,6 +18,12 @@ If you don't want to install python3.8 on your main operating system, you can in
 # If you don't specify the number of packets, by default it only captures 5 packets
 # If you don't specify the protocol, by default I cathurate only TCP packets
 
+# clone the repository
+$ git clone https://github.com/d4rk6h05t/dark-sniffer.git
+
+# access the project directory
+$ cd dark-sniffer
+
 # If you are using virtualenv or simply want to install the package, 
 # you can use either of these 2 commands, they both have the same purpose
 
@@ -30,18 +36,12 @@ $ pip install -r requirements.txt
 # Or if you are using pipfile you can install the package using the following command
 $ pipenv install
 
-# clone the repository
-$ git clone https://github.com/d4rk6h05t/dark-sniffer.git
-
-# access the project directory
-$ cd dark-sniffer
-
 # Remember,  you must be root or put the sudo command first to raise your permission level
 # ready ! you can try dark-sniffer
-$ sudo python darksniffer.py --help
+$ python darksniffer.py --help
 
-# or also you can use
-$ sudo ./darksniffer.py -h
+# or also you can use for display usage
+$ ./darksniffer.py -h
 
 # remember to navigate a little bit somewhere specific to speed up the capture of packets
 # for convenience use the custom mode to edit all the necessary arguments
