@@ -97,6 +97,24 @@ class DarkSniffer:
               sep = '\n')
         print(f'[+] :: By: {__author__}  :: An small 5n1ff3r {__version__}\n')
     
+    @staticmethod
+    def options():
+        usage = 'usage: sudo ./darksniffer.py [options] [args]'
+
+        parser = OptionParser(usage=usage)
+        
+        parser.add_option('-c', '--csv-file', type='string',dest='filename_csv', help='Save details into CSV file where the details of the intercepted packets')
+        parser.add_option('-j', '--json-file',type='string',dest='filename_json',help='Save details into JSON file where the details of the intercepted packets')
+        parser.add_option('-i', '--interactive', action='store_true', dest='interactive', help='Customize packet capture arguments')
+        parser.add_option('-p', '--packets', type='int', dest='packets',  help='Amount of packages to be captured')
+        parser.add_option('-P', '--protocol', type='string', dest='protocol',  help='Select a specific trotocol [TCP/ICMP/UDP]')
+        parser.add_option('-e', '--empty-packet', action='store_true', dest='empty_packet', help='Accept empty packages in the data field')
+        parser.add_option('-d', '--details-json', action='store_true', dest='json',  help='Display the data in detail in JSON Format')
+        parser.add_option('-v', '--version', action='store_true', dest='version',  help='Display version for more information')
+        
+        (options, args) = parser.parse_args()
+        return (options, args)
+    
     def save_packets_json(self, header, packets_list):
         """
         Receives a list of captured packets and creates a dictionary (JSON) 
@@ -238,25 +256,12 @@ class DarkSniffer:
                             collect_packets.append(packet_info)
                             packet_number += 1
         return collect_packets
-             
+        
 def main(argv):
     
-    usage = 'usage: sudo ./darksniffer.py [options] [args]'
-
-    parser = OptionParser(usage=usage)
-    
-    parser.add_option('-c', '--csv-file', type='string',dest='filename_csv', help='Save details into CSV file where the details of the intercepted packets')
-    parser.add_option('-j', '--json-file',type='string',dest='filename_json',help='Save details into JSON file where the details of the intercepted packets')
-    parser.add_option('-i', '--interactive', action='store_true', dest='interactive', help='Customize packet capture arguments')
-    parser.add_option('-p', '--packets', type='int', dest='packets',  help='Amount of packages to be captured')
-    parser.add_option('-P', '--protocol', type='string', dest='protocol',  help='Select a specific trotocol [TCP/ICMP/UDP]')
-    parser.add_option('-e', '--empty-packet', action='store_true', dest='empty_packet', help='Accept empty packages in the data field')
-    parser.add_option('-d', '--details-json', action='store_true', dest='json',  help='Display the data in detail in JSON Format')
-    parser.add_option('-v', '--version', action='store_true', dest='version',  help='Display version for more information')
-    
-    (options, args) = parser.parse_args()
-    
+    (options, args) = DarkSniffer.options()
     darksniffer = DarkSniffer('collect_packets')
+    
     amount_packets = darksniffer.AMOUNT_PACKETS
     current_protocol = darksniffer.PACKET_TCP_METADATA
     save_csv = empty_packet = packet_details = False
