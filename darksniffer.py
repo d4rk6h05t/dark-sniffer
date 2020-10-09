@@ -28,7 +28,7 @@ import time
 import datetime
 import json
 import csv
-import binascii
+
 from struct import *
 from optparse import OptionParser
 from prettytable import PrettyTable, from_csv
@@ -41,35 +41,13 @@ from protocols.Ethernet import Ethernet
 
 class DarkSniffer:
     
-    ETH_LENGTH = 14
-    ICMP_HEADER_LENGTH = 4
-    UDP_HEADER_LENGTH = 8
-    
     AMOUNT_PACKETS = 5
-    
     NO_PACKET = ['no_packet','datetime']
-    
-    ETH_HEADER = [ 'destination_mac_address', 'source_mac_address', 'eth_protocol', ]
-   
-    PACKET_IP_HEADER = [
-        'version', 'type_of_service', 'total_length', 'identification', 'fragment_Offset',
-        'time_to_live', 'tcp_protocol', 'header_checksum', 'source_address', 'destination_address',
-    ]
-    
-    PACKET_TCP_HEADER = [
-        'source_port', 'destination_port', 'sequence_number', 'acknowledgment_number', 'tcp_header_length', 
-        'data_offset_reserved', 'tcp_flags', 'window', 'tcp_checksum', 'urgent_pointer',
-    ]
-    
-    PACKET_ICMP_HEADER = [ 'icmp_type', 'code', 'checksum' ]
-    
-    PACKET_UDP_HEADER = [ 'source_port', 'destination_port', 'length', 'checksum' ]
-   
     METADATA_DATA = ['data']
     
-    PACKET_TCP_METADATA = NO_PACKET + ETH_HEADER + PACKET_IP_HEADER + PACKET_TCP_HEADER + METADATA_DATA
-    PACKET_ICMP_METADATA = NO_PACKET + ETH_HEADER + PACKET_IP_HEADER + PACKET_ICMP_HEADER + METADATA_DATA
-    PACKET_UDP_METADATA = NO_PACKET + ETH_HEADER + PACKET_IP_HEADER + PACKET_UDP_HEADER + METADATA_DATA
+    PACKET_TCP_METADATA = NO_PACKET + Ethernet.HEADER + IP.HEADER + TCP.HEADER + METADATA_DATA
+    PACKET_ICMP_METADATA = NO_PACKET + Ethernet.HEADER + IP.HEADER + ICMP.HEADER + METADATA_DATA
+    PACKET_UDP_METADATA = NO_PACKET + Ethernet.HEADER + IP.HEADER + UDP.HEADER + METADATA_DATA
     
     def __init__(self,filename):
         self._filename = filename
@@ -117,7 +95,7 @@ class DarkSniffer:
     
     def save_packets_json(self, header, packets_list):
         """
-        Receives a list of captured packets and creates a dictionary (JSON) 
+        Receives a list of captured packets and creates a dictionote to successfully run the script you must be rootnary (JSON) 
         of captured packets and stores them in a .json file
         """
         collect_packets = { 'metadata_packet': [] }
@@ -188,7 +166,7 @@ class DarkSniffer:
             packet = packet[0] 
             ip_header = packet[0:20] 
             
-            eth_header = packet[:self.ETH_LENGTH]
+            eth_header = packet[:Ethernet.LENGTH]
             eth_header_packet = Ethernet(eth_header,packet[0:6],packet[6:12])
             eth_header_unpacked = eth_header_packet.get_attributes() 
             
@@ -197,7 +175,7 @@ class DarkSniffer:
             ip_header_unpacked_length = ip_header_unpacked[0] 
             ip_header_unpacked_struct = ip_header_unpacked[1]
             
-            x = ip_header_unpacked_length + self.ETH_LENGTH
+            x = ip_header_unpacked_length + Ethernet.LENGTH
             
             # [TCP] Transmission Control protocol [RFC 793][code:6]
             if protocol_enable == 'TCP':
@@ -223,7 +201,7 @@ class DarkSniffer:
                     icmp_header = packet[x:( x + 4 )]
                     icmp_header_packet = ICMP(icmp_header)
                     icmp_header_unpacked = icmp_header_packet.get_attributes()
-                    header_size = self.ETH_LENGTH + ip_header_unpacked_length + self.ICMP_HEADER_LENGTH
+                    header_size = Ethernet.LENGTH + ip_header_unpacked_length + ICMP.LENGTH
                     data = packet[header_size:]
                     packet_info =  [ packet_number, str(datetime.datetime.now()), ] + eth_header_unpacked + ip_header_unpacked_struct + icmp_header_unpacked + [ data ]
                 
@@ -243,7 +221,7 @@ class DarkSniffer:
                     udp_header_packet = UDP(udp_header)
                     udp_header_unpacked = udp_header_packet.get_attributes()
                     
-                    header_size = self.ETH_LENGTH + ip_header_unpacked_length + self.UDP_HEADER_LENGTH
+                    header_size = Ethernet.LENGTH + ip_header_unpacked_length + UDP.LENGTH
                     data = packet[header_size:]
                     
                     packet_info =  [ packet_number, str(datetime.datetime.now()), ] + eth_header_unpacked + ip_header_unpacked_struct + udp_header_unpacked + [ data ]
@@ -323,25 +301,25 @@ def main(argv):
             packet_details = True
         
         else:
-            print('IP  Header: ', darksniffer.NO_PACKET + darksniffer.PACKET_IP_HEADER)
+            print('IP  Header: ', darksniffer.NO_PACKET + IP.HEADER)
             
             if protocol_packets == 'TCP':
-                print('TCP Header: ', darksniffer.NO_PACKET + darksniffer.PACKET_TCP_HEADER)
+                print('TCP Header: ', darksniffer.NO_PACKET + TCP.HEADER)
             elif protocol_packets == 'ICMP':
-                print('ICMP Header: ', darksniffer.NO_PACKET + darksniffer.PACKET_ICMP_HEADER)
+                print('ICMP Header: ', darksniffer.NO_PACKET + ICMP.HEADER)
             elif protocol_packets == 'UDP':
-                print('UDP Header: ', darksniffer.NO_PACKET + darksniffer.PACKET_UDP_HEADER)
+                print('UDP Header: ', darksniffer.NO_PACKET + UDP.HEADER)
             
             response_view_table = input(f'[+]  ::  View mode data in the table packet struct [IP/{protocol_packets}] : ').upper()
             
             if response_view_table == 'IP':
-                display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_IP_HEADER
+                display_fields = darksniffer.NO_PACKET + IP.HEADER
             elif response_view_table == 'TCP':
-                display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_TCP_HEADER
+                display_fields = darksniffer.NO_PACKET + TCP.HEADER
             elif response_view_table == 'ICMP':
-                display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_ICMP_HEADER
+                display_fields = darksniffer.NO_PACKET + ICMP.HEADER
             elif response_view_table == 'UDP':
-                display_fields = darksniffer.NO_PACKET + darksniffer.PACKET_UDP_HEADER
+                display_fields = darksniffer.NO_PACKET + UDP.HEADER
             
     table = PrettyTable()
     table.field_names = current_protocol
@@ -364,7 +342,10 @@ def main(argv):
 if __name__ == '__main__':
     try:
         if sys.version_info >= (3, 5):
-            main(sys.argv[1:])
+            if os.getuid() == 0:
+                main(sys.argv[1:])
+            else:
+                sys.exit('[+] :: Note to successfully run the script you must be root.')
         else:
             sys.exit('[+] :: Please update your python version 3.5 or higher.')
     except KeyboardInterrupt:

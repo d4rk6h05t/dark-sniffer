@@ -6,6 +6,11 @@ from struct import *
 
 class IP:
     
+    HEADER = [
+        'version', 'type_of_service', 'total_length', 'identification', 'fragment_Offset',
+        'time_to_live', 'tcp_protocol', 'header_checksum', 'source_address', 'destination_address',
+    ]
+    
     def __init__(self,  ip_header):
         self._ip_header = ip_header
         self.unpack_ip_packet()
