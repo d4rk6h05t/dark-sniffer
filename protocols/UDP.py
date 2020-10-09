@@ -5,6 +5,10 @@ from struct import *
 
 class UDP:
     
+    LENGTH = 8
+    
+    HEADER = [ 'source_port', 'destination_port', 'length', 'checksum' ]
+    
     def __init__(self,  udp_header):
         self._udp_header = udp_header
         self.unpack_udp_packet()

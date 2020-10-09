@@ -5,6 +5,10 @@ from struct import *
 
 class ICMP:
     
+    LENGTH = 4
+    
+    HEADER = [ 'icmp_type', 'code', 'checksum' ]
+    
     def __init__(self,  icmp_header):
         self._icmp_header = icmp_header
         self.unpack_icmp_packe()

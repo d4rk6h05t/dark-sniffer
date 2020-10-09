@@ -5,6 +5,11 @@ from struct import *
 
 class TCP:
     
+    HEADER = [
+        'source_port', 'destination_port', 'sequence_number', 'acknowledgment_number', 'tcp_header_length', 
+        'data_offset_reserved', 'tcp_flags', 'window', 'tcp_checksum', 'urgent_pointer',
+    ]
+    
     def __init__(self, tcp_header, ip_header_unpacked_length, packet):
         self._tcp_header = tcp_header
         self._ip_header_unpacked_length = ip_header_unpacked_length

@@ -7,6 +7,10 @@ from struct import *
 
 class Ethernet:
     
+    LENGTH = 14
+    
+    HEADER = [ 'destination_mac_address', 'source_mac_address', 'eth_protocol', ]
+    
     def __init__(self, eth_header, destination_mac, source_mac):
         self._eth_header = eth_header
         self._destination_mac = destination_mac
