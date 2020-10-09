@@ -11,16 +11,12 @@ I point out that the hacking-related material found in the github account (d4rk6
 The project can be used with **python3.8** for to build. However, it requires **python3.5** as minimum. And  **Ptable** package. 
 If you don't want to install python3.8 on your main operating system, you can install python3.8 on a virtual environment you can use **virtualenv** or **pipenv**
 
-# installation & Usage
+# installation
+Don't despair if it takes longer than my algorithm is optimized. Remember you have to navigate a bit to see your local traffic
+If you don't specify the number of packets, by default it only captures 5 packets, If you don't specify the protocol, by default I cathurate only TCP packets
 ```sh
-# Don't despair if it takes longer than my algorithm is optimized, 
-# Remember you have to navigate a bit to see your local traffic
-# If you don't specify the number of packets, by default it only captures 5 packets
-# If you don't specify the protocol, by default I cathurate only TCP packets
-
 # clone the repository
 $ git clone https://github.com/d4rk6h05t/dark-sniffer.git
-
 # access the project directory
 $ cd dark-sniffer
 
@@ -35,9 +31,10 @@ $ pip install -r requirements.txt
 
 # Or if you are using pipfile you can install the package using the following command
 $ pipenv install
-
-# Remember,  you must be root or put the sudo command first to raise your permission level
-# ready ! you can try dark-sniffer
+```
+# Usage
+Remember,  you must be root or put the sudo command first to raise your permission level, ready! you can try dark-sniffer
+```sh
 $ python darksniffer.py --help
 
 # or also you can use for display usage
@@ -46,7 +43,9 @@ $ ./darksniffer.py -h
 # remember to navigate a little bit somewhere specific to speed up the capture of packets
 # for convenience use the custom mode to edit all the necessary arguments
 $ sudo ./darksniffer.py -c
+```
 
+```sh
 ███████╗ █████╗ ██████╗ ██╗  ██╗     ███████╗███╗  ██╗██████╗██████╗██████╗███████╗██████╗ 
 ██╔═══█║██╔══██╗██╔══██╗██║ ██╔╝     ██╔════╝████╗ ██║╚═██╔═╝██╔═══╝██╔═══╝██╔════╝██╔══██╗
 ██║   █║███████║██████╔╝█████╔╝█████╗███████╗██╔██╗██║  ██║  ██████╗██████╗█████╗  ██████╔╝
@@ -180,7 +179,7 @@ In fact wireshark provides an API for Python to analyze packages the project is 
 
 
 # Author
-By: d4rk6h05t (Michani. M. De La Calleja E.)
+By: d4rk6h05t (Michani. M. De La Calleja E.) | ~тёмный призрак
 
 # License
 ----
