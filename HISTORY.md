@@ -15,4 +15,10 @@ v.1.0.0 / 2020-10-09
   * move receiv argvs to new method options
   * add is root validation in `darksniffer.py` 
   * Change the constants of the different protocols
+  
+v.1.0.0 / 2020-10-15
+===================
+  * add __init__.py into src/protocols
+  * update all classes
+  * change the entire project structure, to gradually scale up this project
  
