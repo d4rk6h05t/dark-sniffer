@@ -14,12 +14,17 @@ If you don't want to install python3.8 on your main operating system, you can in
 # installation
 Don't despair if it takes longer than my algorithm is optimized. Remember you have to navigate a bit to see your local traffic
 If you don't specify the number of packets, by default it only captures 5 packets, If you don't specify the protocol, by default I cathurate only TCP packets
+
 ```sh
 # clone the repository
 $ git clone https://github.com/d4rk6h05t/dark-sniffer.git
 # access the project directory
 $ cd dark-sniffer
+```
 
+Installation of dependencies according to your needs.
+
+```sh
 # If you are using virtualenv or simply want to install the package, 
 # you can use either of these 2 commands, they both have the same purpose
 
@@ -34,15 +39,20 @@ $ pipenv install
 ```
 # Usage
 Remember,  you must be root or put the sudo command first to raise your permission level, ready! you can try dark-sniffer
+
+
 ```sh
+# Change directory to src
+$ cd src
+
 $ python darksniffer.py --help
 
 # or also you can use for display usage
-$ ./darksniffer.py -h
+$ sudo ./darksniffer.py -h
 
 # remember to navigate a little bit somewhere specific to speed up the capture of packets
 # for convenience use the custom mode to edit all the necessary arguments
-$ sudo ./darksniffer.py -c
+$ sudo ./darksniffer.py -i
 ```
 
 ```sh
@@ -71,112 +81,12 @@ Options:
   -e, --empty-packet    Accept empty packages in the data field
   -d, --details-json    Display the data in detail in JSON Format
   -v, --version         Display version for more information
-
 ```
-
-                            Protocol Layering
-
-                        +---------------------+
-                        |     higher-level    |
-                        +---------------------+
-                        |        TCP          |
-                        +---------------------+
-                        |  internet protocol  |
-                        +---------------------+
-                        |communication network|
-                        +---------------------+
-                        
-                         Protocol Relationships 
-
-       +------+ +-----+ +-----+       +-----+
-       |Telnet| | FTP | |Voice|  ...  |     |  Application Level
-       +------+ +-----+ +-----+       +-----+
-             |   |         |             |
-            +-----+     +-----+       +-----+
-            | TCP |     | RTP |  ...  |     |  Host Level
-            +-----+     +-----+       +-----+
-               |           |             |
-            +-------------------------------+
-            |    Internet Protocol & ICMP   |  Gateway Level
-            +-------------------------------+
-                           |
-              +---------------------------+
-              |   Local Network Protocol  |    Network Level
-              +---------------------------+
-
-# Intro to (TCP) Transmission Control Protocol 
-The Transmission Control Protocol (TCP) is used as a a host-to-host protocol between hosts on a computer for packet switching,
-communication networks and in systems interconnected between networks. For more info you can visit [RFC 793](https://tools.ietf.org/html/rfc793)
-The different layers of abstraction are shown below. The figures were obtained from the previously published link.
-
-              
-                        TCP Header Format
-     
-     0                   1                   2                   3
-     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |          Source Port          |       Destination Port        |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |                        Sequence Number                        |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |                    Acknowledgment Number                      |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |  Data |           |U|A|P|R|S|F|                               |
-    | Offset| Reserved  |R|C|S|S|Y|I|            Window             |
-    |       |           |G|K|H|T|N|N|                               |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |           Checksum            |         Urgent Pointer        |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |                    Options                    |    Padding    |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |                             data                              |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Intro to (ICMP) Internet Control Message Protocol
-The Internet Control Message Protocol (ICMP) is a protocol based on the collection of Internet protocols.
-It is used in network devices, including routers, etc. For more info you can visit [RFC 792](https://tools.ietf.org/html/rfc792)
-The figures were obtained from the previously published link.
-
-                Internet Control Message Header Format
-    
-     0                   1                   2                   3
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |     Type      |     Code      |          Checksum             |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |                             unused                            |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    |      Internet Header + 64 bits of Original Data Datagram      |
-    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    
-
-
-# Intro to (UDP) User  Datagram Protocol
-The User Datagram Protocol (UDP) is one of the main protocols in the Internet protocol suite.
-In UDP it defines the ability to send messages, in this case called datagrams,
-to other host computers on an Internet Protocol (IP) network. For more info you can visit [RFC_768](https://tools.ietf.org/html/rfc768)
-The figures were obtained from the previously published link.
-                        
-                        User Datagram Header Format
-    
-                  0      7 8     15 16    23 24    31
-                 +--------+--------+--------+--------+
-                 |     Source      |   Destination   |
-                 |      Port       |      Port       |
-                 +--------+--------+--------+--------+
-                 |                 |                 |
-                 |     Length      |    Checksum     |
-                 +--------+--------+--------+--------+
-                 |                                   |
-                 |          data octets ...          |
-                 +-----------------------------------+
 
 # Additional remarks
 This project is just a simple sniffer with many limitations, if you really want to analyze packages with more depth I recommend you to see projects like [tcpdump](https://www.tcpdump.org/) and [wireshark](https://www.wireshark.org/). 
 
 In fact wireshark provides an API for Python to analyze packages the project is known as [PyShark](https://kiminewt.github.io/pyshark/), investigate it you may be interested.
-
-
 
 # Author
 By: d4rk6h05t (Michani. M. De La Calleja E.) | ~тёмный призрак

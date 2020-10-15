@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
 
+#   Author: Copyright (C) 2020 Michani. M. De La Calleja E. [ d4rk6h05t ~тёмный призрак ] 
+#
+#   I point out that the hacking-related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only. 
+#   You are responsible for your own actions.
+
 __author__  = 'd4rk6h05t [Michani. M. De La Calleja E.]'
 __version__ = 'v1.0.0'
 __github__  = 'https://github.com/d4rk6h05t/dark-sniffer'
 __email__   = 'd4rk6h05t_0d4y5@protonmail.ch'
 __license__ = 'GNU GPLv3'
-
-"""
-Author: Copyright (C) 2020 d4rk6h05t [ Michani. M. De La Calleja E. / d4rk6h05t_0d4y5@protonmail.ch ]
-
-I point out that the hacking-related material found in the github account (d4rk6h05t) is for educational and demonstration purposes only. 
-You are responsible for your own actions.
-
-DarkSniffer [ small DarkSniffer only TCP/ICMP/UDP incoming packet ]
-Sniffers are programs that can capture/sniff/detect packet of network traffic per packet and analyze
-additional note to successfully run the script you must be root or prepend the sudo command at the time of executing the script, for example: 
- 
- $ sudo python darksniffer.py
- or 
- $ sudo ./darksniffer.py
-"""
 
 import os
 import sys
@@ -31,14 +21,21 @@ import csv
 
 from struct import *
 from optparse import OptionParser
-from prettytable import PrettyTable, from_csv
 
-from protocols.IP import IP
-from protocols.TCP import TCP
-from protocols.UDP import UDP
-from protocols.ICMP import ICMP
-from protocols.Ethernet import Ethernet 
+try:
+    
+    from prettytable import PrettyTable, from_csv
 
+    from protocols.IP import IP
+    from protocols.TCP import TCP
+    from protocols.UDP import UDP
+    from protocols.ICMP import ICMP
+    from protocols.Ethernet import Ethernet 
+
+except ImportError as import_error:
+    print(f'[!] Missing a package: {str(import_error)} ')
+    sys.exit()
+    
 class DarkSniffer:
     
     AMOUNT_PACKETS = 5
@@ -73,7 +70,7 @@ class DarkSniffer:
               '███████║█ ║  ██║██║  ██║██║  ██╗     ███████║██║ ╚═██║██████╗██║    ██║    ███████╗██║  ██║',
               ' ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝     ╚══════╝╚═╝   ╚═╝╚═════╝╚═╝    ╚═╝    ╚══════╝╚═╝  ╚═╝',
               sep = '\n')
-        print(f'[+] :: By: {__author__}  :: An small 5n1ff3r {__version__}\n')
+        print(f'[+] :: By: {__author__} :: {__version__}\n')
     
     @staticmethod
     def options():

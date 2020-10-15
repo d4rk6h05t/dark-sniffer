@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# Author: Copyright (C) 2020 d4rk6h05t [ Michani. M. De La Calleja E. / d4rk6h05t_0d4y5@protonmail.ch ]
+
+#   Author: Copyright (C) 2020 Michani. M. De La Calleja E. [ d4rk6h05t ~тёмный призрак ]
 
 import socket
 from struct import *
